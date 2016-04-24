@@ -1,0 +1,13 @@
+
+The license for Prism is "The Apache Software License, Version 1.1".
+It is included in the file LICENSE_dbprism.
+
+The license for jetty is "The Apache Software License, Version 2.0" see http://www.eclipse.org/jetty/licenses.php.
+
+The license for log4j is "The Apache Software License, Version 2.0", see https://logging.apache.org/log4j/1.2/license.html
+
+The license for servlet-api.jar is "Apache License Version 2.0", it is included in the jar file.
+
+The license for the oracle jdbc driver is "OTN License Agreement". Since you accessing 
+an Oracle database anyway this should not matter to you.
+

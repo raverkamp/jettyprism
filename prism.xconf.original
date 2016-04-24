@@ -1,0 +1,573 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<properties>
+    <!-- this is an original xprism config file, Roland Averkamp-->
+  <variables>
+    <variable name="demo.path" value="/@WEB@/sample"/>
+    <variable name="demo.db" value="@JDBC_STRING@"/>
+    <variable name="cms.user" value="@CMS_USER@"/>
+    <variable name="cms.pass" value="@CMS_PASS@"/>
+  </variables>
+  <category name="general">
+    <!-- Email which displays on Error page with error level set to 2
+      -->
+    <property name="webmaster" value="webmaster@yourdomain.com"/>
+
+    <!--
+      Defines which funcionality uses DBPrism for flexible parameter pasing.
+      possible values: old|compact
+      Default: old
+
+      "old" functionality is compatible with Oracle Web Server 4.x
+      that is, for an url like this:
+      http://www.acme.com/@WEB@/sample/!@USER@.my_pkg.my_proc?x=a&y=b&x=c
+      four parameter will be passed, like these:
+        num_entries ==> 3
+        name_array ==> (`x', `y', `x')
+        value_array ==> (`a', `b', `c')
+        reserved ==> (reserved)
+      "compact" functionality is compatible with Oracle mod_plsql
+      for the above url example, the encoded argument will be:
+        name_array ==> (`x', `y', `x')
+        value_array ==> (`a', `b', `c')
+      Note that two arguments of type array will be passed
+    -->
+    <property name="flexibleRequest" value="compact"/>
+
+    <!--
+      Locale setting, which affects NLS_NUMERIC_CHARACTERS and NLS_DATE_FORMAT
+      lang and country are using in java Locale(lang,country) object
+      The default values are extracted from the JVM default Locale.
+      Due to this change could affect other sensitivy JVM components
+      I recomend to use JVM default setting
+
+      lang codes are the lower-case two-letter codes as defined by ISO-639.
+      You can find a full list of these codes at a number of sites,
+      such as: http://www.ics.uci.edu/pub/ietf/http/related/iso639.txt
+    <property name="lang" value="en"/>
+    -->
+
+    <!--
+      country codes are the upper-case two-letter codes as defined by ISO-3166.
+      You can find a full list of these codes at a number of sites,
+      such as: http://www.chemie.fu-berlin.de/diverse/doc/ISO_3166.html
+    <property name="country" value="us"/>
+    -->
+
+    <!--
+      Choose behavior of getdplsPath() and getPathInfo() function
+      This depends on your system, change it if DB Prism doesn't work
+      possible values: 0|1|2
+      default: 0
+    -->
+    <property name="behavior" value="0"/>
+
+    <!--
+      Caching procedures description will increase speed, but can cause problems
+      when procedure description changes (e.g. during development proces)
+      possible values: true or false
+      default: true
+    -->
+    <property name="cacheprocedure" value="true"/>
+
+    <!--
+      Modes of compatibilty supported by Prism
+      See sections factory and jdbcDriver
+      Each compatibility mode requires entries into these sections
+
+       New in version 1.2.1 
+      9iplsql is similar to 8i compatibilty but using Oracle 9i system views
+      9ijava is similar to java compatibilty but using Oracle 9i system views
+    -->
+    <property name="compatlist" value="7x 8i java 9ijava 9iplsql"/>
+
+    <!--
+      Default content type of @WEB@ output
+      If you want to display non-ascii characters set proper charset here
+      default : text/html
+      example : text/html; charset=iso-8859-2
+      example : text/html; charset=utf-8
+    -->
+    <property name="contenttype" value="text/html; charset=iso-8859-1"/>
+
+    <!--
+      UnauthorizedText Sent after SC_UNAUTHORIZED response
+      default : You must be enter DB username and password to access at the system
+      Tips: to redirect to another page use HTML tag META as showing below
+      Remember used well formed XML tags under Cocoon.
+    -->
+    <property name="UnauthorizedText" value="You must be enter DB username and password to access at the system"/>
+
+    <!--
+      Connection alias, same as PL/SQL agent virtual path
+      Example: sample => for virtual dir /@WEB@/sample
+      Example: demo => for virtual dir /@WEB@/demo
+      Work with multiple zones definition in @WEB@
+      The @WEB@ zones args must be point to the same prism.properties and Prism.jar
+      See web.xml file for more details
+    -->
+    <property name="alias" value="sample java cms cmsd demo.jsp travel apex secure"/>
+
+    <!--
+      Default Section. Parameter defined into this section will be used as custom
+      default values for the DAD. It will be override DBPrism default values.
+    -->
+    <property name="connectString" value="${demo.db}"/>
+    <property name="errorLevel" value="0"/>
+    <property name="errorPage" value="/404.html"/>
+    <property name="dbcharset" value="iso-8859-1"/>
+    <property name="clientcharset" value="iso-8859-1"/>
+    <property name="dynamicLoginRealm" value="new DB Login"/>
+    
+    <!-- Values for JTADBPrismConnectionCacheImpl -->
+    <property name="MinLimit" value="0"/>
+    <property name="MaxLimit" value="3"/>
+    <property name="LoginTimeout" value="10"/>
+    <!-- deprecated in 2.1.2 -->
+    <property name="CacheScheme" value="FixedWait"/>
+    <!-- new in 2.1.2 -->
+    <property name="InitialLimit" value="0"/>
+    <property name="MaxStatementsLimit" value="0"/>
+    <property name="ValidateConnection" value="false"/>
+    <!-- end user default values -->
+  </category>
+  
+  <category name="factory">
+    <property name="7x" value="com.prism.oracle.DB7xFactory"/>
+    <property name="8i" value="com.prism.oracle.DB8iFactory"/>
+    <property name="9iplsql" value="com.prism.oracle.DB8iFactory"/>
+    <!-- property name="lite" value="com.prism.oracle.DBLiteFactory"/ -->
+    <property name="java" value="com.prism.oracle.DBJavaFactory"/>
+    <property name="9ijava" value="com.prism.oracle.DBJavaFactory"/>
+  </category>
+
+  <category name="jdbcDriver">
+    <property name="7x" value="oracle.jdbc.driver.OracleDriver"/>
+    <property name="8i" value="oracle.jdbc.driver.OracleDriver"/>
+    <property name="9iplsql" value="oracle.jdbc.driver.OracleDriver"/>
+    <!-- property name="lite" value="oracle.lite.poljdbc.POLJDBCDriver"/-->
+    <property name="java" value="oracle.jdbc.driver.OracleDriver"/>
+    <property name="9ijava" value="oracle.jdbc.driver.OracleDriver"/>
+  </category>
+
+  <!-- Init DAD sample -->
+  <category name="DAD_sample">
+    <!--
+      Database Username and password for alias sample
+      Example: @USER@
+      Example: @PASS@
+      NEW IN VERSION 1.1.0
+      "left in blank if you choose dynamic login"
+    -->
+    <!--<property name="dbusername" value="scott"/>
+    <property name="dbpassword" value="TIGER"/>-->
+    <property name="connectString" value="jdbc:oracle:thin:@localhost:1521:ltrav01"/>
+
+  <!--  "jdbc:oracle:thin:scott/tiger@myhost:1521:orcl-->
+    
+    <!--
+      errorLevel: (default 0)
+        0 => return 404 error code - Not Found, may be redirect by the Web Server to another page
+        1 => no error reporting redirect to errorPage url 
+        2 => maximum error reporting package+proc+(args,values)
+    -->
+    <property name="errorLevel" value="2"/>
+
+    <!--
+      errorPage: url to redirect if error level is 0
+    -->
+    <property name="errorPage" value="/404.html"/>
+
+    <!--
+      dynamicLoginRealm: String that the browser show to the users when ask for username and password
+      Example: Finance
+      Default: new DB Login
+    -->
+    <property name="dynamicLoginRealm" value="new DB Login"/>
+
+    <!--
+      Htp toolkit used, 3x => WAS 3.x,  4x => OAS 4.x, Web DB or IAS 1.0
+      Default 3x
+    -->
+    <property name="toolkit" value="4x"/>
+
+    <!--
+      Compatibilty mode Value defined into general:compatlist
+      8=> Work with JDBC drivers of Oracle 8.1.5 or 8.1.6 (8i versions) run faster (Default)
+      7=> Work with other JDBC drivers
+      Default: 7x
+    -->
+    <property name="compat" value="8i"/>
+
+    <!--
+      Charset used by @WEB@ engine to enable non-ascii input
+      JServ or JSDK needs this - they don't detect parameters charset
+      Default: iso-8859-1
+    -->
+    
+
+    <property name="dbcharset" value="utf-8"/>
+    <property name="clientcharset" value="iso-8859-1"/>
+
+    <!--
+      StateLess:
+      Values: true or false
+      Default: false
+      If false, DB Prism calls dbms_session.reset_package procedure before a client procedure
+      to warranty reset all packages variables and global states (OWS 3.0 behaviour and OWSKiller)
+      In Oracle Lite support you has to write StateFull code in com.prism.polite.DBMS_Session class
+      If true, don't calls to Reset Session, and then, global variables of packages, for example, persist
+      across differents http calls, this no warranty same connection objects to the same client
+      for this purpose use Transactions and leave this parameter with the default value
+    -->
+    <property name="StateLess" value="false"/>
+
+    <!--
+      Document table
+      This table is used by the upload/download functionality to store the content
+      Values:  [schema.]table_name
+      Default: owa_public.wpg_document
+    -->
+    <property name="documentTable" value="wpg_document"/>
+
+    <!--
+      Document Access Path
+      This path is used by the DB Prism gateway interface to check if the document will be downloaded
+      by the Document Access Procedure
+      Then to download a document from the content repository calls this URL 
+         http://server:port/@WEB@/sample/docs/xx/yy/file.ext
+      Values:  valid_sub_path_name
+      Default: docs
+    -->
+    <property name="docAccessPath" value="docs"/>
+
+    <!--
+      Document Access Procedure procedure
+      This procedure is called by the DB Prism gateway in order to set up the file to be download
+      This procedure is called without argument
+      Values:  [[schema.]package.]procedure_name
+      Default: owa_public.wpg_testdoc.process_download
+    -->
+    <property name="docAccessProcedure" value="demo.process_download"/>
+
+    <!--
+      Default Page
+      Defines which procedure is called if a subdirectory is given.
+      Values:  [[schema.]package.]procedure_name
+      Default: wwwIndex.html
+    -->
+    <property name="defaultPage" value="demo.startup"/>
+
+    <!--
+      Always Call Default Page
+      Ignore package procedure in the url call, calls always to the defaultPage.
+      Values:  true|false
+      Default: false
+    -->
+    <property name="alwaysCallDefaultPage" value="false"/>
+
+    <!--
+      Custom authentication
+      This parameters replaces the old style custom authentication seted by OWA_CUSTOM or OWA initialize procedures
+      Values:  none|global|perPackage|custom
+      Default: none
+    -->
+    <property name="customAuthentication" value="none"/>
+    
+    <!--
+      Type used to pass multivaluaded input forms or with flexible parameter support
+      this data type is only used with oracle 7x database because it doesn't include
+      this information in user_arguments view.
+      type_owner is the user which has installed the toolkit (owa_public is the default value)
+      type_name is the package which defines the sample table type (owa_util is the default value)
+      type_subname is the sample table type defined to pass multivalued infomation (ident_arr is the default value)
+      
+    <property name="type_owner" value="owa_public"/>
+    <property name="type_name" value="owa_util"/>
+    <property name="type_subname" value="ident_arr"/>
+    -->
+
+    <!--
+      NEW PARAMETERS VERSION 2.0.1
+      debugHost/debugPort
+      hostname and port where Oracle JDeveloper 9i is listening for
+      remote debugging using JPDA protocol
+      only works with Oracle 9.2.0+ and JDeveloper 9.0.3+
+      Uncomment the above two parameters if you want to
+      enable server side debug information of PLSQL or Java
+      
+    <property name="debugHost" value="localhost"/>
+    <property name="debugPort" value="4400"/>
+    -->
+    
+    
+    <!--
+      NEW PARAMETERS VERSION 2.1.1
+      nls_lang
+      Overrides NLS_LANG enviroment setting at the level of the DAD
+      The example will excecute for each request (previous to populate the CGI env)
+      SQL> alter session set NLS_LANGUAGE='AMERICAN' NLS_TERRITORY='AMERICA';
+      
+    <property name="nls_lang" value="AMERICAN_AMERICA.WE8ISO8859P1"/>
+    -->
+
+
+    <!--
+      JTADBPrismConnectionCacheImpl parameters
+        Defines Min/Max number of connection for an specific DAD
+        also defines how many second wait for a login successful.
+        MinLimit: Sets the minimum number of connections the cache maintains.
+              This guarantees that the cache will not shrink below this minimum
+              limit. Setting the MinLimit property does not initialize the cache
+              to contain the minimum number of connections. To do this, use the
+              InitialLimit property. See "InitialLimit".
+        MaxLimit: Sets the maximum number of connection instances the cache can
+              hold. The default value is Integer.MAX_VALUE, meaning that there
+              is no limit enforced by the connection cache, so that the number
+              of connections is limited only by the number of database sessions
+              configured for the database.
+        LoginTimeout: Specifies cache behavior when a connection is requested
+              and there are already MaxLimit connections active.
+              If ConnectionWaitTimeout is greater than zero (0), each connection
+              request waits for the specified number of seconds, or until a
+              connection is returned to the cache. If no connection is returned
+              to the cache before the timeout elapses, the connection request
+              returns null.
+        ValidateConnection: Setting ValidateConnection to true causes the
+              connection cache to test every connection it retrieves against the
+              underlying database.
+        InitialLimit: Sets how many connections are created in the cache when it
+              is created or reinitialized. When this property is set to an
+              integer value greater than 0, creating or reinitializing the cache
+              automatically creates the specified number of connections, filling
+              the cache in advance of need.
+        MaxStatementsLimit: Sets the maximum number of statements that a
+              connection keeps open. When a cache has this property set,
+              reinitializing the cache or closing the datasource automatically
+              closes all cursors beyond the specified MaxStatementsLimit.
+    -->
+    <property name="MinLimit" value="0"/>
+    <property name="MaxLimit" value="3"/>
+    <property name="LoginTimeout" value="10"/>
+    <!-- deprecated -->
+    <!-- property name="CacheScheme" value="FixedWait"/ -->
+    <!-- new in 2.1.2 -->
+    <property name="InitialLimit" value="0"/>
+    <property name="MaxStatementsLimit" value="0"/>
+    <property name="ValidateConnection" value="false"/>
+    <!--
+      NEW PARAMETERS VERSION 2.1.2
+      nls_lang
+      Overrides NLS_LANG enviroment setting at the level of the DAD
+      The example will excecute for each request (previous to populate the CGI env)
+      SQL> alter session set NLS_LANGUAGE='AMERICAN' NLS_TERRITORY='AMERICA';
+      -->    
+    <!--
+      Character or String used as escape value for flexible parameter behaviour
+      Values:  non empty string
+      Default: !  (mod_plsql syntax)
+    -->
+    <property name="flexibleEscapeChar" value="!"/>
+    <!--
+      Character or String used as escape value for XForm Request Wrapper
+      Values:  non empty string
+      Default: ^  (hat/caret, DBPrism 2.1.1 syntax)
+    -->
+    <property name="xformEscapeChar" value="^"/>
+    <!--
+      Parameter name used to pass the HTTP Request parameters encoded as XForms Instance
+      or sent into the HTTP Post input string
+      Values:  non empty string
+      Default: post_xml  (DBPrism 2.1.1 syntax)
+    -->
+    <property name="xformParamName" value="post_xml"/>
+
+    <!--
+      Connect to the database using proxy user behavior
+      DAD username and password will be used to connect to the database,
+      then the proxy user extracted from req.getUserPrincipal().getName() or req.getRemoteUser()
+      is passed to the Connection using:
+      ((OracleConnection)sqlconn).openProxySession(OracleConnection.PROXYTYPE_USER_NAME,proxyUserInfo);
+      Note that JTADBPrismConnectionCacheImpl is required as connection cache manager for using
+      proxy user support.
+      Values:  true|false
+      Default: false
+    -->
+    <property name="useProxyUser" value="false"/>
+    <!-- End DAD sample -->
+  </category>
+
+  <!--
+    DAD lite demo Oracle lite with Java Stored Procedures
+  -->
+  <category name="xDAD_lite">
+    <property name="dbusername" value="system"/>
+    <property name="dbpassword" value="mgr"/>
+    <property name="connectString" value="jdbc:polite:Polite"/>
+    <property name="compat" value="lite"/>
+
+    <!--
+      Case sensity, with Java Stored procedure support in Oracle Lite Databases
+      this parameter control if the package.procedure is converted to upper, lower or as is
+      Values:  lower|upper|case
+      Default: upper
+    -->
+    <property name="case" value="lower"/>
+  </category>
+
+  <!--
+    DAD java, use with demos to show Java Stored Procedures support with Oracle 8i
+  -->
+  <category name="xDAD_java">
+    <property name="dbusername" value="@USER@"/>
+    <property name="dbpassword" value="@PASS@"/>
+    <property name="compat" value="java"/>
+    <property name="defaultPage" value="DEMOj.startup"/>
+    <property name="docAccessPath" value="download"/>
+    <property name="docAccessProcedure" value="DEMOj.download"/>
+    <property name="documentTable" value="wpg_document"/>
+  </category>
+
+  <!--
+    DAD cms, used by DBPrism CMS for uploading document to the CMS repository
+    ask user/password before upload to set the correct VPD context.
+  -->
+  <category name="xDAD_cms">
+    <property name="dbusername" value="${cms.user}"/>
+    <property name="dbpassword" value="${cms.pass}"/>
+    <property name="compat" value="java"/>
+    <property name="defaultPage" value="CMSj.docs_load"/>
+    <property name="docAccessPath" value="download"/>
+    <property name="docAccessProcedure" value="CMSj.download"/>
+    <property name="documentTable" value="wpg_document"/>
+    <property name="StateLess" value="true"/>
+    <property name="customAuthentication" value="perPackage"/>
+  </category>
+
+  <!--
+    DAD cmsd, used by DBPrism CMS for downloading from the wpg repository
+    Used to download embebed images into OpenOffice documents uploaded to the CMS
+  -->
+  <category name="xDAD_cmsd">
+    <property name="dbusername" value="${cms.user}"/>
+    <property name="dbpassword" value="${cms.pass}"/>
+    <property name="compat" value="java"/>
+    <property name="defaultPage" value="CMSj.docs_load"/>
+    <property name="docAccessPath" value="download"/>
+    <property name="docAccessProcedure" value="CMSj.download"/>
+    <property name="documentTable" value="wpg_document"/>
+    <property name="StateLess" value="true"/>
+  </category>
+
+  <!--
+    DAD demo.jsp to test <jsp:include> tags.
+    Note that jsp:include tags sent the JSP page name as DAD then you need to
+    define a default page to handle the original request.
+  -->
+  <category name="xDAD_demo.jsp">
+    <property name="dbusername" value="@USER@"/>
+    <property name="dbpassword" value="@PASS@"/>
+    <property name="connectString" value="${demo.db}"/>
+    <property name="defaultPage" value="demo.jsp"/>
+  </category>
+
+  <category name="xDAD_travel">
+    <property name="dbusername" value="travel"/>
+    <property name="dbpassword" value="travel"/>
+    <property name="connectString" value="${demo.db}"/>
+  </category>
+
+  <category name="xDAD_secure">
+    <property name="dbusername" value="@USER@"/>
+    <property name="dbpassword" value="@PASS@"/>
+    <property name="connectString" value="${demo.db}"/>
+    <property name="useProxyUser" value="true"/>
+    <property name="toolkit" value="4x"/>
+    <property name="compat" value="8i"/>
+    <property name="dbcharset" value="utf-8"/>
+    <property name="clientcharset" value="iso-8859-1"/>
+    <property name="docAccessPath" value="docs"/>
+    <property name="docAccessProcedure" value="demo.process_download"/>
+  </category>
+
+  <category name="xDAD_apex">
+    <property name="dbusername" value="apex_public_user"/>
+    <property name="dbpassword" value="@APEX_PASS@"/>
+    <property name="connectString" value="${demo.db}"/>
+    <property name="useProxyUser" value="false"/>
+    <property name="defaultPage" value="apex"/>
+    <property name="toolkit" value="4x"/>
+    <property name="compat" value="8i"/>
+    <property name="documentTable" value="wwv_flow_file_objects$"/>
+    <property name="docAccessPath" value="docs"/>
+    <property name="docAccessProcedure" value="wwv_flow_file_mgr.process_download"/>
+    <property name="dbcharset" value="utf-8"/>
+    <property name="clientcharset" value="utf-8"/>
+    <property name="nls_lang" value="American_America.AL32UTF8"/>
+    <property name="errorLevel" value="2"/>
+  </category>
+
+  <category name="Manager">
+    <!--
+      Minimal/Maximun numbers of Connections to database
+      Valid for JdbcDBPrismConnectionCacheImpl
+    -->
+    <property name="minconnections" value="0"/>
+    <property name="maxconnections" value="20"/>
+
+    <!--
+      Defines how many seconds a connection could stay in a busy list
+      Default 600
+    -->
+    <property name="timeout" value="600"/>
+
+    <!--
+      false Disable Transaction behavior
+      true Enable Transaction behavior
+    -->
+    <property name="TxEnable" value="true"/>
+
+    <!--
+      Default empty
+      List of space separated TX names
+    -->
+    <property name="TxNames" value="demo"/>
+    
+    <!--
+      New in version 1.2.0
+      Defines which implementation uses for allocating connection
+      This parameter is MANDATORY
+      Values:
+        - com.prism.utils.JdbcDBPrismConnectionCacheImpl
+        - com.prism.oracle.JTADBPrismConnectionCacheImpl
+      com.prism.utils.JdbcDBPrismConnectionCacheImpl has the same functionality as
+      DB Prism 1.1.x ResourceManager class
+      com.prism.oracle.JTADBPrismConnectionCacheImpl is implemented using the new
+      functionality of Oracle JDBC 2.0 optional package includes into oracle version 8.1.6+
+      but JDBC 8.1.7+ drivers is highly recomended due to several bugs into 8.1.6
+      com.prism.utils.JndiDBPrismConnectionCacheImpl Connection Caching using
+      JNDI Datasources defined into a J2EE container (data-sources.xml file)
+
+    <property name="class" value="com.prism.utils.JndiDBPrismConnectionCacheImpl"/>
+    <property name="class" value="com.prism.utils.JdbcDBPrismConnectionCacheImpl"/>
+    <property name="class" value="com.prism.oracle.UCPDBPrismConnectionCacheImpl"/>
+    -->
+    <!--<property name="class" value="com.prism.oracle.JTADBPrismConnectionCacheImpl"/-->
+    <property name="class" value="com.prism.utils.JdbcDBPrismConnectionCacheImpl"/>
+    
+    
+  </category>
+
+<!--
+TX syntax for each names defined in Manager.TXNames
+must be an exact definition of Begin,Rollback,Commit,BelongTo, and TimeOut values
+BelongTo URI is an list of ; separated field of URI inside the transaccion end it by *
+TimeOut is in seconds
+-->
+  <category name="TX_demo">
+    <property name="BeginURI" value="${demo.path}/m_tx.tx_start"/>
+    <property name="CommitURI" value="${demo.path}/m_tx.tx_end"/>
+    <property name="RollBackURI" value="${demo.path}/m_tx.tx_rollback"/>
+    <property name="BelongTo" value="${demo.path}/m_tx.*"/>
+    <property name="TimeOut" value="500"/>
+  </category>
+</properties>

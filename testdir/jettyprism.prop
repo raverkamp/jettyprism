@@ -1,0 +1,11 @@
+
+#static.b.dir=yui/build
+#static.b.wdir=/yui/build
+#static.b.cache-control=max-age=86400, public
+
+static.c.dir=web
+static.c.wdir=/web
+
+log4jconfig=
+
+prismconf=prism.xconf

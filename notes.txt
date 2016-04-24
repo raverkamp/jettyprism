@@ -1,0 +1,102 @@
+
+
+this work now
+http://localhost:8080/dads/user_jp/theweb.test1
+
+set java_home=C:\Program Files\Java\jdk1.7.0_21
+
+* Format of config file
+
+properties
+  [variables 
+    variable*
+   ]
+  (category
+      property*
+   )*
+
+variable has the attributes name, value
+category has the attributes name
+property has the attributes name, value
+
+The category general is used for defaults.
+
+
+* Ansonsten
+
+DBPrism benutzt keine Bind-Variablen. Schlecht.
+
+Rumspielen:
+Mixen von javascripts und PL/SQL ist schwierig,
+wenn ich mit Jettyprism rumprobiere kann ich Javascript
+Dateien im Filesystem ablegen. Mit Weblogic ist
+das wieder anders.
+
+Mehr ausprobieren, Proxy user ist nicht getestet.
+Array Parameter sind nicht getestet.
+Charactersets sind auch nicht getestet. 
+
+Das Package htp hat  Probleme,
+als response length wird die Bytelänge in der DB mitgegeben.
+DB UTF-8, reponse charset 8 bit => der Browser wartet noch auf ein paar Bytes mehr.
+
+htp.p kann eine Exception werfen wenn Umlaute geschrieben werden, DB Zeichsatz UTF-8
+aber Bytelength Semantik. :-(
+
+Upload auch nicht getestet.
+
+Den Rest testen würde ich auch nur wenn etwas konkret ansteht.
+
+Deployen in Apache:
+Sollte immer noch funktionieren, denn das Jetty wird über 
+die Standard Schnittstellen konfiguriert.
+Achtung Änderungen in der Konfigurationsdatei.
+
+* Konfiguration
+Konfigurations Datei für prism
+Konfiguration für Jetty
+
+Einbinden von prism an einem bestimmten Punkt.
+Mehrmals?
+Parameter ist der Konfigurations Datei.
+
+Parameter sind
+log4jconfig= datei für die configuration von log4j
+
+Überschreiben Propertis auf der Kommandozeile?
+
+und dann die DADs
+dad.name.property ...
+und 
+static.name.
+
+
+Java Property Files sind Bäume.
+Jeder Knoten hat Werte.
+Wie funktioniert Merge von Bäumen?
+
+
+
+Properties:
+log4jconfig
+
+the name of the log4j property file
+
+Static file serving
+
+static.a.dir : the directory that will be served
+static.a.wdir : the path under which is accessible
+static.a.cache-control :
+   the CacheControl Line that will be served
+   ex. max-age=86400, public means anyone may cache, check again in 86400 seconds 
+    which is one day
+
+
+
+* Logging
+log4j.properties setze 
+log4j.rootLogger=INFO, A1
+oder
+log4j.rootLogger=DEBUG, A1
+
+die INFO einstellung ist beseer

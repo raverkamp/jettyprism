@@ -1,0 +1,81 @@
+<project name="jettyprism" default="dist" basedir=".">
+    <description>
+        simple build file for jettyprism, so it can be build without netbeans
+    </description>
+    <!-- set global properties for this build -->
+    <property name="src" location="src"/>
+    <property name="testsrc" location="test"/>
+    <property name="build" location="build"/>
+    <property name="dist"  location="dist"/>
+    <property name="junit-jar" location="C:\Program Files\NetBeans 7.3\platform\modules\ext\junit-4.10.jar"/>
+
+    <fileset dir="${basedir}/libs" casesensitive="no" id="libs">
+        <include name="log4j-1.2.17.jar"/>
+        <include name="servlet-api.jar"/>
+        <include name="jetty-all-9.0.6.v20130930.jar"/>
+        <include name="ojdbc7.jar"/>
+    </fileset>
+
+    <target name="init" depends="clean">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}"/>
+    </target>
+    
+    <target name="testclasses" depends="dist">
+         <javac srcdir="${testsrc}" destdir="${build}">
+            <classpath>
+                 <file name="${junit-jar}"/>
+                <file name="${dist}/jettyprism.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="compile" depends="init"
+          description="compile the source " >
+        <!-- Compile the java code from ${src} into ${build} -->
+        <javac srcdir="${src}" destdir="${build}">
+            <classpath>
+                <fileset refid="libs"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="dist" depends="compile"
+          description="generate the distribution" >
+        <!-- Create the distribution directory -->
+        <mkdir dir="${dist}/lib"/>
+    
+        <jar jarfile="${dist}/jettyprism.jar" basedir="${build}">
+            <manifest>
+                <attribute name="Main-Class"
+                 value="spinat.jettyprism.Main"/>
+                <attribute name="Class-Path" value="lib/jetty-all-9.0.6.v20130930.jar lib/servlet-api.jar lib/jconfig.jar lib/log4j-1.2.17.jar lib/ojdbc7.jar"/>
+            </manifest>
+        </jar>
+        <copy todir="${dist}/lib">
+            <fileset refid="libs"/>
+        </copy>
+    </target>
+
+    <target name="clean"
+          description="clean up" >
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+    </target>
+  
+    <target name="test" depends="dist,testclasses">
+        <junit fork="yes" printsummary="true" showoutput="true">
+            <jvmarg value="-Djava.compiler=NONE"/>
+            <test name="jettyprism.TestJConfig"/>
+            <classpath>
+                <file name="${dist}/jettyprism.jar"/>
+                <file name="${junit-jar}"/>
+                <pathelement path="${dest}"/>
+            </classpath>
+            <formatter type="plain" usefile="false"/>
+        </junit>
+    </target>
+</project>
