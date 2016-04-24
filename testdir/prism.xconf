@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 <properties>
+    <!-- config file testing. Do adapt see teh connection property -->
   <variables>
     <!--variable name="demo.path" value="/@WEB@/sample"/-->
   </variables>
