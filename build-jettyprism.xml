@@ -45,16 +45,16 @@
     <target name="dist" depends="compile"
           description="generate the distribution" >
         <!-- Create the distribution directory -->
-        <mkdir dir="${dist}/lib"/>
+        <mkdir dir="${dist}/jettyprism"/>
     
-        <jar jarfile="${dist}/jettyprism.jar" basedir="${build}">
+        <jar jarfile="${dist}/jettyprism/main.jar" basedir="${build}">
             <manifest>
                 <attribute name="Main-Class"
                  value="spinat.jettyprism.Main"/>
-                <attribute name="Class-Path" value="lib/jetty-all-9.0.6.v20130930.jar lib/servlet-api.jar lib/jconfig.jar lib/log4j-1.2.17.jar lib/ojdbc7.jar"/>
+                <attribute name="Class-Path" value="./jetty-all-9.0.6.v20130930.jar ./servlet-api.jar ./jconfig.jar ./log4j-1.2.17.jar ./ojdbc7.jar"/>
             </manifest>
         </jar>
-        <copy todir="${dist}/lib">
+        <copy todir="${dist}/jettyprism">
             <fileset refid="libs"/>
         </copy>
     </target>
