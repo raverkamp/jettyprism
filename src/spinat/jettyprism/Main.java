@@ -19,14 +19,11 @@ package spinat.jettyprism;
 //
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.HashSet;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
@@ -78,10 +75,26 @@ public class Main {
             intPort = Integer.parseInt(port);
         }
         msg("using port " + intPort);
+        
+        final Server server;
+        String only_local = props.getProperty("only_local","1");
+        if (only_local.equalsIgnoreCase("N")||only_local.equalsIgnoreCase("NO") 
+                || only_local.equalsIgnoreCase("F") ||only_local.equalsIgnoreCase("FALSE")
+                ||only_local.equalsIgnoreCase("0")) {
+           msg("using all addressses");
+           server = new Server(intPort);    
+        } else {
+            
+          InetAddress iadr = InetAddress.getLoopbackAddress();
+          msg("using address " + iadr);
+          InetSocketAddress siadr = new InetSocketAddress(iadr,intPort);
+          server = new Server(siadr);
+        }
+        
         // Create a basic jetty server object that will listen on port 8080.  Note that if you set this to port 0
         // then a randomly available port will be assigned that you can either look in the logs for the port,
         // or programmatically obtain it for use in test cases.
-        Server server = new Server(intPort);
+        
         HandlerList handlers = new HandlerList();
         server.setHandler(handlers);
 

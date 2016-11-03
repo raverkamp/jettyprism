@@ -9,3 +9,5 @@ static.c.wdir=/web
 log4jconfig=
 
 prismconf=prism.xconf
+
+only_local=1
