@@ -105,14 +105,25 @@ public class DBConnPLSQL extends DBConnection {
      * HTBUF_LEN HTBUF_LEN = 256 (in htp public spec)
      */
     private String getDataBlock() throws SQLException {
+
         String s_GetPageSql
-                = "declare nlns number;\n" + " buf_t varchar2(32767);\n"
-                + " lines htp.htbuf_arr;\n" + "begin\n" + "  nlns := ?;\n"
-                + "  OWA.GET_PAGE(lines, nlns);\n" + "  if (nlns < 1) then\n"
-                + "   buf_t := null;\n" + "  else \n"
-                + "   for i in 1..nlns loop\n" + "     buf_t:=buf_t||lines(i);\n"
-                + "   end loop;\n" + "  end if;\n" + "  ? := buf_t; ? := nlns;\n"
-                + "end;";
+            = "declare nlns number;\n"
+            + "  buf_t varchar2(32767);\n"
+            + "  lines htp.htbuf_arr;\n"
+            + "begin\n" 
+            + "  nlns := ?;\n" // the maximum of lines
+            + "  OWA.GET_PAGE(lines, nlns);\n"
+            + "  if (nlns < 1) then\n"
+            + "    buf_t := null;\n"
+            + "  else \n"
+            + "    for i in 1..nlns loop\n"
+            + "      buf_t:=buf_t||lines(i);\n"
+            + "    end loop;\n" 
+            + "  end if;\n"
+            + "  ? := buf_t;\n" 
+            + "  ? := nlns;\n"
+            + "end;";
+
 
         try (CallableStatement cs = sqlconn.prepareCall(s_GetPageSql)) {
            

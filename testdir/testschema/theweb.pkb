@@ -42,6 +42,9 @@ htp.p('<input type=text name="c">');
 htp.p('<input type=text name="d">');
 htp.p('<input type="submit">');
 htp.p('</form>');
+
+htp.p('<a href="./theweb.gen_excel">Excel </a>');
+
 htp.p('</div>');
 
 htp.bodyclose;
@@ -103,6 +106,28 @@ htp.p('<div>');
 htp.p(x);
 htp.p('</div>');
 end;
+
+
+procedure gen_excel is
+begin
+ owa_util.mime_header('application/excel', false, 'ISO-8859-4');
+ htp.p('');
+ htp.p('<html>');
+ htp.p('<head></head>');
+ htp.p('<body>');
+ htp.p('<table>');
+ for i in 1 .. 20 loop
+ htp.p('<tr>');
+ htp.p('<td>'||i||'</td><td>hasgd'||i||'</td>');
+ htp.p('</tr>');
+ end loop;
+ 
+ htp.p('</table>');
+ 
+ htp.p('</body>');
+ htp.p('</html>'); 
+end;
+
 end;
 
 /

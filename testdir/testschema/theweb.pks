@@ -11,5 +11,7 @@ procedure bightml(sizee varchar2) ;
 
 procedure clobtest(a varchar2,b clob,c varchar2,d clob);
 
+procedure gen_excel;
+
 end;
 /
