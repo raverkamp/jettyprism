@@ -194,7 +194,7 @@ public class ConnInfo {
         }
 
        
-        factory = new com.prism.oracle.DB8iFactory();
+        factory = new com.prism.DBFactory();
         
         clientCharset =
            properties.getProperty("clientcharset","iso-8859-1","DAD_"+aliasdef);

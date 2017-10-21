@@ -9,6 +9,10 @@
 
 package com.prism;
 
+
+import com.prism.oracle.Download8i;
+import com.prism.oracle.SPProcPLSQL;
+import com.prism.oracle.Upload8i;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,46 +33,39 @@ import javax.servlet.http.HttpServletRequest;
  * Modified: 3/Feb/2004 by <a href="mailto:pyropunk@usa.net">Alexander Graesser</a> (LXG)<BR>
  * Changes : <UL><LI>JavDoc cleanup</LI></UL>
  */
-public abstract class DBFactory {
+public  class DBFactory {
   public DBFactory() {
     // LXG: call to super is generated anyway but put it here for clarity.
     super();
   }
+public SPProc createSPProc(ConnInfo conn, String procname, Connection sqlconn) throws SQLException {
+        SPProcPLSQL cc = new SPProcPLSQL();
+        return cc.create(conn, procname, sqlconn);
+    }
 
-  /** 
-   * This method returns a concrete SPProc instance. 
-   * @param conn ConnInfo
-   * @param procname String
-   * @param sqlconn Connection
-   * @return SPProc
-   * @throws SQLException
-   */
-  public abstract SPProc createSPProc(ConnInfo conn, String procname, Connection sqlconn) throws SQLException;
+    /**
+     * This method returns a concrete DBConnPLSQL instance.
+     */
+    public DBConnection createDBConnection(ConnInfo connInfo) {
+        DBConnection cc = new DBConnection();
+        return cc.create(connInfo);
+    }
 
-  /** 
-   * This method returns a concrete DBConnection instance. 
-   * @param connInfo ConnInfo
-   * @return DBConnection
-   */
-  public abstract DBConnection createDBConnection(ConnInfo connInfo);
+    /**
+     * This method returns a concrete UploadRequest instance.
+     */
+    public UploadRequest createUploadRequest(HttpServletRequest request, DBConnection repositoryConnection)
+            throws IOException, SQLException {
+        Upload8i cc = new Upload8i(request, repositoryConnection);
+        return cc;
+    }
 
-  /** 
-   * This method returns a concrete UploadRequest instance. 
-   * @param request HttpServletRequest
-   * @param repositoryConnection DBConnection
-   * @return UploadRequest
-   * @throws IOException
-   * @throws SQLException
-   */
-  public abstract UploadRequest createUploadRequest(HttpServletRequest request, DBConnection repositoryConnection) throws IOException, SQLException;
-
-  /** 
-   * This method returns a concrete DownloadRequest instance. 
-   * @param request HttpServletRequest
-   * @param repositoryConnection DBConnection
-   * @return DownloadRequest
-   * @throws IOException
-   * @throws SQLException
-   */
-  public abstract DownloadRequest createDownloadRequest(HttpServletRequest request, DBConnection repositoryConnection) throws IOException, SQLException;
+    /**
+     * This method returns a concrete DownloadRequest instance.
+     */
+    public DownloadRequest createDownloadRequest(HttpServletRequest request,
+            DBConnection repositoryConnection) throws IOException, SQLException {
+        Download8i cc = new Download8i();
+        return cc.create(request, repositoryConnection);
+    }
 }

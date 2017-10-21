@@ -122,8 +122,6 @@ public class Download8i extends DownloadRequest {
      */
     public void callAccessProcedure() throws SQLException {
         CallableStatement cs = null;
-        if (((DBConnPLSQL)conn).toolkitVersion.equalsIgnoreCase("3x"))
-            throw new SQLException("DBPrism - 8i Adapter: Can't provide this funcionality through toolkit 3x");
         try {
              cs =
                  conn.sqlconn.prepareCall("BEGIN " + conn.connInfo.docAccessProcedure +
