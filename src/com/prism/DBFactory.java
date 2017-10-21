@@ -10,7 +10,6 @@
 package com.prism;
 
 
-import com.prism.oracle.Download8i;
 import com.prism.oracle.SPProcPLSQL;
 import com.prism.oracle.Upload8i;
 import java.io.IOException;
@@ -65,7 +64,7 @@ public SPProc createSPProc(ConnInfo conn, String procname, Connection sqlconn) t
      */
     public DownloadRequest createDownloadRequest(HttpServletRequest request,
             DBConnection repositoryConnection) throws IOException, SQLException {
-        Download8i cc = new Download8i();
+        DownloadRequest cc = new DownloadRequest();
         return cc.create(request, repositoryConnection);
     }
 }
