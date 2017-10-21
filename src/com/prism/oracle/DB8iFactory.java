@@ -59,8 +59,8 @@ public class DB8iFactory extends DBFactory {
      */
     public UploadRequest createUploadRequest(HttpServletRequest request, DBConnection repositoryConnection)
             throws IOException, SQLException {
-        Upload8i cc = new Upload8i();
-        return cc.create(request, repositoryConnection);
+        Upload8i cc = new Upload8i(request, repositoryConnection);
+        return cc;
     }
 
     /**

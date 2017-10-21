@@ -29,6 +29,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
@@ -38,16 +39,16 @@ import javax.servlet.http.Part;
  * http://www.acme.com/pls/myDAD/!scott.my_pkg.my_proc?x=a&y=b&x=c num_entries ==] 3 name_array ==] (`x', `y', `x');
  * value_array ==] (`a', `b', `c') reserved ==] ()
  */
-public class FlexibleRequest implements HttpServletRequest {
+public class FlexibleRequest extends HttpServletRequestWrapper {
     protected HttpServletRequest req;
 
     /** This Hastable stores Vectors with the parameter values extracted from the request */
     private Hashtable parameters = new Hashtable();
 
-    public FlexibleRequest() { };
+   
 
     public FlexibleRequest(HttpServletRequest request) throws IOException {
-        super();
+        super(request);
         // Sanity check values
         if (request == null)
             throw new IllegalArgumentException("request cannot be null");

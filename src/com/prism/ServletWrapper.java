@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 
@@ -58,35 +59,24 @@ public class ServletWrapper extends HttpServlet {
         super.init(sc);
         try {
             String propfilename = sc.getInitParameter("properties");
-            if (propfilename == null ||
-                propfilename.equals("/WEB-INF" + DBPrism.PROPERTIES)) {
-                // No parameter is defined or relative path, use default value with CONTEXT information
-                if (this.getServletContext().getResource("/WEB-INF/") !=
-                    null) {
-                    // Avoid null pointer exception on HP-As container
-                    propfilename =
-                        this.getServletContext().getResource("/WEB-INF/")
-                        .toExternalForm() + DBPrism.PROPERTIES.substring(1);
+            if (propfilename == null) {
+                String res = sc.getInitParameter("ressource");
+                if (res==null) {
+                    res = "prism.xconf";
                 }
+                URL url = this.getServletContext().getResource("/WEB-INF/"+res);
+                propfilename= url.toExternalForm().substring("file:".length());
             }
-            if (log.isDebugEnabled()) {
-                log
-                .debug("<<<<<<<<<<<<<<< DBPrism Servlet init >>>>>>>>>>>>>>>");
-                log.debug("servlet initialised.");
-            }
+            log.debug("<<<<<<<<<<<<<<< DBPrism Servlet init >>>>>>>>>>>>>>>");
+            log.debug("servlet initialised.");
             // LXG: now intialise DBPrism
             DBPrism.initDBPrism(propfilename);
         } catch (Exception e) {
-            if (log == null) {
-                System.err
-                .println("Error Loading " + sc.getInitParameter("properties"));
-                e.printStackTrace();
-            } else {
-                log
-                .error("Error Loading " + sc.getInitParameter("properties"), e);
-            }
+            log.error("Error Loading " + sc.getInitParameter("properties"), e);
+            throw new ServletException(e);
         }
     }
+    
 
     // LXG: removed ServletException since it is not actully thrown by the method
     // LXG: just put it in again if the complier complains.
@@ -94,8 +84,7 @@ public class ServletWrapper extends HttpServlet {
 
     public void service(HttpServletRequest req,
                         HttpServletResponse res) throws IOException {
-        if (log.isDebugEnabled())
-            log.debug(".service entered.");
+        log.debug(".service entered.");
         int errorLevel = 0;
         String errorPage = "/error.html";
         DBPrism glassPrism = null;

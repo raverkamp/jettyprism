@@ -11,3 +11,5 @@ log4jconfig=
 prismconf=prism.xconf
 
 only_local=1
+
+port=8888

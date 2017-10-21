@@ -38,7 +38,6 @@ import javax.servlet.http.Part;
  * Implements the AbstractProduct Interface (UploadRequest)
  */
 public class Upload8i extends UploadRequest {
-    public Upload8i() { };
 
     public Upload8i(HttpServletRequest request, DBConnection repositoryConnection) throws IOException, SQLException {
         super(request, repositoryConnection);

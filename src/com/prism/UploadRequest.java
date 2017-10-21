@@ -27,6 +27,7 @@ import javax.servlet.http.HttpSession;
 
 import com.prism.utils.RequestParameters;
 import com.prism.utils.UploadContent;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 /**
  * This class plays the role of AbstractProduct of the Abstract Factory pattern.
@@ -39,7 +40,7 @@ import com.prism.utils.UploadContent;
  *           <LI>JavDoc cleanup</LI>
  *           <LI>code cleanup</LI></UL>
  */
-public abstract class UploadRequest implements HttpServletRequest {
+public abstract class UploadRequest extends HttpServletRequestWrapper {
 //    private static final java.lang.String UNKNOWN = "unknown";
     protected HttpServletRequest req;
     protected DBConnection conn; // Connection information to access to the repository
@@ -57,15 +58,11 @@ public abstract class UploadRequest implements HttpServletRequest {
     public abstract UploadRequest create(HttpServletRequest request, DBConnection repositoryConnection)
         throws IOException, SQLException;
 
-    public UploadRequest() { 
-      // LXG: call to super is generated anyway but put it here for clarity.
-      super();
-    }
- 
+   
     // LXG: removed SQLException as it is not thrown
     // public UploadRequest(HttpServletRequest request, DBConnection repositoryConnection) throws IOException, SQLException {
     public UploadRequest(HttpServletRequest request, DBConnection repositoryConnection) throws IOException {
-        super();
+        super(request);
         // Sanity check values
         if (request == null)
             throw new IllegalArgumentException("request cannot be null");

@@ -29,6 +29,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
@@ -45,16 +46,15 @@ import javax.servlet.http.Part;
  *    name_array ==> (`x', `y', `z')
  *    values_array ==> ('john', '10', 'doe') 
  */
-public class FlexibleRequestCompact implements HttpServletRequest {
+public class FlexibleRequestCompact extends HttpServletRequestWrapper {
     protected HttpServletRequest req;
 
     /** This Hastable stores Vectors with the parameter values extracted from the request */
     private Hashtable parameters = new Hashtable();
 
-    public FlexibleRequestCompact() { };
 
     public FlexibleRequestCompact(HttpServletRequest request) throws IOException {
-        super();
+        super(request);
         // Sanity check values
         if (request == null)
             throw new IllegalArgumentException("request cannot be null");

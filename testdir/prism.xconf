@@ -116,7 +116,7 @@
 
 <category name="DAD_user_jp">
     <property name="dynamicLoginRealm" value="This is user_jp"/>
-    <property name="connectString" value="jdbc:oracle:thin:@localhost:11521:xe"/>
+    <property name="connectString" value="jdbc:oracle:thin:@localhost:1521:xe"/>
 </category>
 
  <category name="Manager">
