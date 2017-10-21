@@ -9,7 +9,6 @@
 
 package com.prism;
 
-import com.prism.oracle.SPProcPLSQL;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
@@ -246,8 +245,8 @@ public  class DBConnection {
         ArrayList<Boolean> isClob = new ArrayList<>();
         //we will set array variables here
         int foundcount = 0;
-        SPProcPLSQL plp =
-            (SPProcPLSQL)DBPrism.proccache.get(connInfo, servletname, sqlconn);
+        SPProc plp =
+            DBPrism.proccache.get(connInfo, servletname, sqlconn);
         //JHK, to use overloaded get
         // Build procedure call parameter by parameter
         Enumeration real_args = req.getParameterNames();

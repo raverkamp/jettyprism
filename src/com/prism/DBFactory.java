@@ -10,8 +10,8 @@
 package com.prism;
 
 
-import com.prism.oracle.SPProcPLSQL;
-import com.prism.oracle.Upload8i;
+
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -38,7 +38,7 @@ public  class DBFactory {
     super();
   }
 public SPProc createSPProc(ConnInfo conn, String procname, Connection sqlconn) throws SQLException {
-        SPProcPLSQL cc = new SPProcPLSQL();
+        SPProc cc = new SPProc();
         return cc.create(conn, procname, sqlconn);
     }
 
@@ -55,7 +55,7 @@ public SPProc createSPProc(ConnInfo conn, String procname, Connection sqlconn) t
      */
     public UploadRequest createUploadRequest(HttpServletRequest request, DBConnection repositoryConnection)
             throws IOException, SQLException {
-        Upload8i cc = new Upload8i(request, repositoryConnection);
+        UploadRequest cc = new UploadRequest(request, repositoryConnection);
         return cc;
     }
 

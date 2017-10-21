@@ -10,6 +10,7 @@
 
 package com.prism;
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -27,7 +28,11 @@ import javax.servlet.http.HttpSession;
 
 import com.prism.utils.RequestParameters;
 import com.prism.utils.UploadContent;
+import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequestWrapper;
+import oracle.jdbc.OraclePreparedStatement;
+import oracle.jdbc.OracleResultSet;
+import oracle.sql.BLOB;
 
 /**
  * This class plays the role of AbstractProduct of the Abstract Factory pattern.
@@ -40,7 +45,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
  *           <LI>JavDoc cleanup</LI>
  *           <LI>code cleanup</LI></UL>
  */
-public abstract class UploadRequest extends HttpServletRequestWrapper {
+public class UploadRequest extends HttpServletRequestWrapper {
 //    private static final java.lang.String UNKNOWN = "unknown";
     protected HttpServletRequest req;
     protected DBConnection conn; // Connection information to access to the repository
@@ -54,10 +59,11 @@ public abstract class UploadRequest extends HttpServletRequestWrapper {
     public UploadContent upload = new UploadContent();
     public Random rand = new Random();
 
-    /** Abstract method of Factory */
-    public abstract UploadRequest create(HttpServletRequest request, DBConnection repositoryConnection)
-        throws IOException, SQLException;
-
+     /** Create a concrete SPProc (Upload8i). */
+    public UploadRequest create(HttpServletRequest request, DBConnection repositoryConnection)
+        throws IOException, SQLException {
+            return new UploadRequest(request, repositoryConnection);
+    }
    
     // LXG: removed SQLException as it is not thrown
     // public UploadRequest(HttpServletRequest request, DBConnection repositoryConnection) throws IOException, SQLException {
@@ -464,5 +470,69 @@ public abstract class UploadRequest extends HttpServletRequestWrapper {
         }
     }
 
-    public abstract void saveFile(HttpServletRequest preq) throws SQLException;
+ public void saveFile(HttpServletRequest req) throws SQLException {
+        String m_dir = null;
+        String m_field_name;
+        String m_field_value;
+        BLOB myblob;
+        OraclePreparedStatement ps = null;
+        OracleResultSet rs = null;
+        try {
+            for (int u = 0; u < upload.getFiles().getCount(); u++) {
+                m_field_name = upload.getFiles().getFile(u).getFieldName();
+                if (!upload.getFiles().getFile(u).isMissing()) {
+                    m_dir = "F" + String.valueOf(Math.abs(rand.nextInt()));
+                    m_field_value = m_dir + "/" + upload.getFiles().getFile(u).getFileName();
+                    setParameter(m_field_name, m_field_value);
+                    try {
+                        ps = (OraclePreparedStatement)conn.sqlconn.prepareStatement("insert into " +
+                            conn.connInfo.documentTable + "  (name,mime_type,doc_size,dad_charset,last_updated,blob_content) values(?,?,?,?,?,empty_blob())");
+                        ps.setString(1, m_field_value);
+                        ps.setString(2, upload.getFiles().getFile(u).getTypeMIME() + "/" +
+                            upload.getFiles().getFile(u).getSubTypeMIME());
+                        ps.setInt(3, upload.getFiles().getFile(u).getSize());
+                        ps.setString(4, conn.connInfo.clientCharset);
+                        ps.setDate(5, new java.sql.Date(System.currentTimeMillis()));
+                        ps.execute();
+                        ps.close();
+                        ps = null;
+                        ps = (OraclePreparedStatement)conn.sqlconn.prepareStatement("select blob_content from " +
+                            conn.connInfo.documentTable + " where name=? for update");
+                        ps.setString(1, m_field_value);
+                        rs = (OracleResultSet)ps.executeQuery();
+                        if (rs.next()) {
+                            myblob = rs.getBLOB(1);
+                            OutputStream outstream = myblob.getBinaryOutputStream();
+                            outstream.write(upload.getFiles().getFile(u).fileToBlob());
+                            outstream.flush();
+                            outstream.close();
+                        }
+                    } catch (Exception e) {
+                        throw new SQLException(e.toString());
+                    } finally {
+                        if (rs != null) {
+                            rs.close();
+                            rs = null;
+                        }
+                        if (ps != null) {
+                            ps.close();
+                            ps = null;
+                        }
+                    }
+                }
+            }
+            Enumeration p_names = upload.getRequest().getParameterNames();
+            while (p_names.hasMoreElements()) {
+                String name = (String)p_names.nextElement();
+                String vals[] = upload.getRequest().getParameterValues(name);
+                for (int i = 0; i < vals.length; i++) {
+                    String val = new String(vals[i].getBytes(conn.connInfo.clientCharset));
+                    setParameter(name, val);
+                }
+            }
+        } catch (Exception e) {
+            throw new SQLException(e.toString());
+        }
+    }
+
 }
