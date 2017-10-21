@@ -247,15 +247,15 @@ public class JdbcDBPrismConnectionCacheImpl implements java.lang.Runnable, DBPri
         connection.connInfo = cc_tmp; // Set default values for ConnInfo object
         connection.connInfo.txEnable = false; // begun as direct connection
         connection.connInfo.status = ConnInfo.CONN_DIR;
-				if (log.isDebugEnabled()) {
-          log.debug("connectString: " + cc_tmp.connectString );
-					log.debug("user: " + usr );
-					//log.debug("pass: " + pass );
-				}
-  			connection.sqlconn = DriverManager.getConnection(cc_tmp.connectString, usr, pass);
+	if (log.isDebugEnabled()) {
+            log.debug("connectString: " + cc_tmp.connectString );
+	    log.debug("user: " + usr );
+		//log.debug("pass: " + pass );
+        }
+  	connection.sqlconn = DriverManager.getConnection(cc_tmp.connectString, usr, pass);
         connection.sqlconn.setAutoCommit(false);
         if (log.isDebugEnabled())
-				  log.debug("Connect without auto commit "+TxId);
+            log.debug("Connect without auto commit "+TxId);
     }
 
     /**

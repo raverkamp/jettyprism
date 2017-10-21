@@ -46,8 +46,7 @@ public SPProc createSPProc(ConnInfo conn, String procname, Connection sqlconn) t
      * This method returns a concrete DBConnPLSQL instance.
      */
     public DBConnection createDBConnection(ConnInfo connInfo) {
-        DBConnection cc = new DBConnection();
-        return cc.create(connInfo);
+        return new DBConnection(connInfo);
     }
 
     /**

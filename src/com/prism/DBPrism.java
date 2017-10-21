@@ -64,7 +64,8 @@ public class DBPrism {
     /**
      * Singleton instance
      */
-    static DBPrism instance = null;
+   // static DBPrism instance = null;
+    static boolean isInitialized = false;
 
     /**
      * private connection which hold the connection betwen makePage and getPage
@@ -249,35 +250,18 @@ public class DBPrism {
      * @param filename
      * @throws ExecutionErrorMsgException
      */
-    public static void initDBPrism(String filename) throws ExecutionErrorMsgException {
-        if (instance == null) {
-            instance = new DBPrism(filename);
+    public static synchronized void initDBPrism(String filename) throws Exception {
+        if (!isInitialized) {
+            init(filename);
+            isInitialized = true;
         }
     }
 
-    /**
-     * A private constructor since this is a Singleton
-     *
-     * @param filename
-     * @throws ExecutionErrorMsgException
-     */
-    private DBPrism(String filename) throws ExecutionErrorMsgException {
-        if (log.isDebugEnabled()) {
-            log.debug("DBPrism(" + filename + ")");
-        }
-        try {
-            init(filename);
-        } catch (Exception e) {
-            throw new ExecutionErrorMsgException(e.getMessage());
-        }
-    }
 
     /**
      * A public constructor to manage multiple connections
      */
     public DBPrism() {
-        // LXG: call to super is generated anyway but put it here for clarity.
-        super();
         if (log.isDebugEnabled()) {
             log.debug("DBPrism()");
         }

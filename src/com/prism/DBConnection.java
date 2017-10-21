@@ -83,12 +83,6 @@ public  class DBConnection {
 
     static final int MAX_PL_LINES = 127;
 
-
-  public DBConnection() {
-    // LXG: call to super is generated anyway but put it here for clarity.
-    super();
-  }
-
   /**
    * Template method calls<BR>
    * 1. resetPackages without parameters<BR>
@@ -443,8 +437,8 @@ public  class DBConnection {
      * Create a concrete DBConnection (DBConnPLSQL). Find extra properties attributes of this connection and return a
      * concrete connection object.
      */
-    public DBConnection create(ConnInfo cc) {
-        DBConnection con = new DBConnection();
+    public DBConnection (ConnInfo cc) {
+        DBConnection con = this;
         con.connInfo = cc;
         con.toolkitVersion =
             properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
@@ -466,7 +460,6 @@ public  class DBConnection {
                 .warn("Incorrect syntax on nls_lang parameter: " + nlsSetting);
             }
         }
-        return con;
     }
 
   /**
@@ -957,7 +950,7 @@ public  class DBConnection {
    * @return ConnInfo object "demo"
    * @throws SQLException
    */
-  public static synchronized ConnInfo getConnInfo(HttpServletRequest req) throws SQLException {
+  public static synchronized ConnInfo getConnInfox(HttpServletRequest req) throws SQLException {
     return getConnInfo(ConnInfo.getURI(req));
   }
 

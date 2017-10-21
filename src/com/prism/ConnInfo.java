@@ -68,10 +68,6 @@ public class ConnInfo {
     public java.lang.String xform_escape_char;
     public java.lang.String xform_param_name;
     
-    public ConnInfo() {
-      // LXG: call to super is generated anyway but put it here for clarity.
-      super();
-    }
 
     /**
      * This method is called once by the ResourceManager.
@@ -91,37 +87,7 @@ public class ConnInfo {
         properties = null;
     }
 
-    /**
-     * Copy Constructor, don't copy usr/pass
-     * @param cc ConnInfo
-     */
-    public ConnInfo(ConnInfo cc) {
-        connAlias = cc.connAlias;
-        stateLess = cc.stateLess;
-        errorPage = cc.errorPage;
-        errorLevel = cc.errorLevel;
-        dynamicLoginRealm = cc.dynamicLoginRealm;
-        documentTable = cc.documentTable;
-        docAccessPath = cc.docAccessPath;
-        docAccessProcedure = cc.docAccessProcedure;
-        defaultPage = cc.defaultPage;
-        alwaysCallDefaultPage = cc.alwaysCallDefaultPage;
-        customAuthentication = cc.customAuthentication;
-        factory = cc.factory;
-        txEnable = cc.txEnable;
-        status = cc.status;
-        connectString = cc.connectString;
-        clientCharset = cc.clientCharset;
-        dbCharset = cc.dbCharset;
-        type_owner = cc.type_owner;
-        type_name = cc.type_name;
-        type_subname = cc.type_subname;
-        flexible_escape_char = cc.flexible_escape_char;
-        xform_escape_char = cc.xform_escape_char;
-        xform_param_name = cc.xform_param_name;
-        proxyUser = cc.proxyUser;
-    }
-
+  
     /**
      * This method makes a ConnInfo objects through the aliasdef Connection alias is retrieved from the URL information
      * Example: plsql => the URL http://server:port/servlet/plsql/xx.yy?arg=val
