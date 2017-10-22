@@ -13,5 +13,7 @@ procedure clobtest(a varchar2,b clob,c varchar2,d clob);
 
 procedure gen_excel;
 
+procedure show_info;
+
 end;
 /

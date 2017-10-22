@@ -97,10 +97,9 @@ public class ServletWrapper extends HttpServlet {
             // checks for download functionality
             if (pathInfo != null &&
                 pathInfo.startsWith("/" + cc_tmp.docAccessPath + "/")) {
-                glassPrism.downloadDocumentFromDB(req, res);
+                glassPrism.downloadDocumentFromDB(req, res, cc_tmp);
             } else {
-                glassPrism.makePage(req);
-                Content r = glassPrism.getPage(req);
+                Content r = glassPrism.makePage(req, cc_tmp);
                 showPage(req, res, r);
             }
         } catch (NotAuthorizedException ne) {
@@ -123,14 +122,7 @@ public class ServletWrapper extends HttpServlet {
             else {
                 sendErrorPage(res);
             }
-        } finally {
-            if (glassPrism != null)
-                try {
-                  glassPrism.recycle(req);
-                } catch (SQLException sqe) {
-                    log.warn(".service - exception releasing engine",sqe);
-                }
-        }
+        } 
         if (log.isDebugEnabled())
             log.debug(".service exited.");
     }

@@ -43,7 +43,8 @@ htp.p('<input type=text name="d">');
 htp.p('<input type="submit">');
 htp.p('</form>');
 
-htp.p('<a href="./theweb.gen_excel">Excel </a>');
+htp.p('<a href="./theweb.gen_excel">Excel </a><br>');
+htp.p('<a href="./theweb.show_info">Header-Info</a>');
 
 htp.p('</div>');
 
@@ -126,6 +127,22 @@ begin
  
  htp.p('</body>');
  htp.p('</html>'); 
+end;
+
+procedure show_info is
+begin
+  HTP.HTMLOPEN;
+htp.headopen;
+htp.headclose;
+htp.bodyopen;
+htp.p('<table border="1">');
+  for i in 1..owa.num_cgi_vars loop
+    htp.p('<tr><td>'||  owa.cgi_var_name(i)||'</td><td>'||owa.cgi_var_val(i)||'</td></tr>');
+  end loop;
+  htp.p('</table>');
+htp.bodyclose;
+htp.htmlclose;
+
 end;
 
 end;

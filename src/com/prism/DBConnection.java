@@ -63,10 +63,10 @@ public  class DBConnection {
   // NO_CHECK    constant integer := 1;
   // GLOBAL      constant integer := 2;
   // PER_PACKAGE constant integer := 3;
-  static public final int NO_CHECK = 1; /* no authorization check             */
-  static public final int GLOBAL = 2; /* global check by a single procedure */
-  static public final int PER_PACKAGE = 3; /* use auth procedure in each package */
-  static public final int CUSTOM = 4;
+  //static public final int NO_CHECK = 1; /* no authorization check             */
+  //static public final int GLOBAL = 2; /* global check by a single procedure */
+  //static public final int PER_PACKAGE = 3; /* use auth procedure in each package */
+  //static public final int CUSTOM = 4;
   public Connection sqlconn;
   public ConnInfo connInfo;
   private static Hashtable dicc = null;

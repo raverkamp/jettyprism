@@ -71,7 +71,7 @@ public class DBPrism {
      * private connection which hold the connection betwen makePage and getPage
      * steps
      */
-    private DBConnection connection = null;
+    //private DBConnection connection = null;
 
     /**
      * Makes a page from Request If the request has not user/pass information
@@ -85,11 +85,11 @@ public class DBPrism {
      * @param req HttpServletRequest
      * @throws Exception
      */
-    public void makePage(HttpServletRequest req) throws Exception {
+    public Content makePage(HttpServletRequest req, ConnInfo cc_tmp) throws Exception {
         if (log.isDebugEnabled()) {
             log.debug(".makePage entered.");
         }
-        ConnInfo cc_tmp = new ConnInfo(req);
+        DBConnection connection = null;
         String name;
         String password;
         try {
@@ -140,17 +140,18 @@ public class DBPrism {
                 }
             }
             connection.doCall(req, name, password);
+            Content pg = connection.getGeneratedStream(req);
             if (log.isDebugEnabled()) {
                 log.debug(".makePage doCall success on " + connection);
             }
+            return pg;
         } catch (Exception e) {
             // try to free the connection
             log.error(".makePage exception: " + connection, e);
             // throw the exception as is
             throw e;
-        }
-        if (log.isDebugEnabled()) {
-            log.debug(".makePage exited.");
+        } finally {
+            recycle(req, connection);
         }
     }
 
@@ -161,18 +162,6 @@ public class DBPrism {
      */
     public String getVersion() {
         return NAME + VERSION + " (C) Marcelo F. Ochoa (2000-2008)";
-    }
-
-    /**
-     * Returns a page and free the connection if not null * @param req
-     *
-     * @param req HttpServletRequest
-     * @return Reader
-     * @throws Exception
-     */
-    public Content getPage(HttpServletRequest req) throws Exception {
-        Content pg = connection.getGeneratedStream(req);
-        return pg;
     }
 
     /**
@@ -188,10 +177,10 @@ public class DBPrism {
      * @param res
      * @throws Exception
      */
-    public void downloadDocumentFromDB(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        ConnInfo cc_tmp = new ConnInfo(req);
+    public void downloadDocumentFromDB(HttpServletRequest req, HttpServletResponse res, ConnInfo cc_tmp ) throws Exception {
         String name;
         String password;
+        DBConnection connection = null;
         try {
             int i;
             String str;
@@ -238,9 +227,8 @@ public class DBPrism {
             if (log.isDebugEnabled()) {
                 log.debug("DBPrism: doDownload success on " + connection);
             }
-        } catch (Exception e) {
-            // throw the exception as is
-            throw e;
+        } finally {
+            recycle(req, connection);
         }
     }
 
@@ -273,13 +261,12 @@ public class DBPrism {
      * @param req
      * @throws SQLException
      */
-    public void recycle(HttpServletRequest req) throws SQLException {
+    private static void recycle(HttpServletRequest req, DBConnection connection ) throws SQLException {
         // try to free the connection
         if (connection != null) {
             connection.releasePage();
             cache.release(req, connection);
         }
-        connection = null;
     }
 
     /**
