@@ -32,8 +32,10 @@ import java.sql.Types;
 import java.util.ArrayList;
 
 import java.util.Properties;
+import oracle.jdbc.OracleCallableStatement;
 
 import oracle.jdbc.OracleConnection;
+import oracle.jdbc.OracleTypes;
 import oracle.sql.CLOB;
 
 /**
@@ -494,7 +496,7 @@ public  class DBConnection {
   /** Concrete operation of Template Method pattern. Pass CGI Enviroment to the DB */
     public void setCGIVars(HttpServletRequest req, String name,
                            String pass) throws SQLException {
-        CallableStatement cs = null;
+      //  OracleCallableStatement cs = null;
         
         StringBuffer command = new StringBuffer("alter session set ");
         if (this.nlsLanguage != null) {
@@ -502,20 +504,14 @@ public  class DBConnection {
         } else {
             command.append("NLS_LENGTH_SEMANTICS=CHAR");
         }
-        try {
-          cs = sqlconn.prepareCall(command.toString());
-          cs.execute();
-          if (log.isDebugEnabled()) {
+        try (OracleCallableStatement cs = (OracleCallableStatement)sqlconn.prepareCall(command.toString())) {
+            cs.execute();
+            if (log.isDebugEnabled()) {
               log.debug(".setCGIVars - " + command + " for DAD: " +
                       this.connInfo.connAlias + " - Done.");
-          }
+            }
         } catch (SQLException sqe) {
            log.warn("Warning, can't alter session: ", sqe);
-        } finally {
-           if (cs != null) {
-               cs.close();
-           }
-           cs = null;
         }
         command =
             new StringBuffer("DECLARE var_val owa.vc_arr;\n");
@@ -547,34 +543,37 @@ public  class DBConnection {
         command.append("   owa.password:=?;\n");
         params.add(pass);
         command.append("   owa.hostname:=?;\n");
-        
         params.add(req.getRemoteHost());
+        
         if ("3x".equalsIgnoreCase(toolkitVersion)) {
             command.append("   htp.rows_in:=0; htp.rows_out:=0;\n");
         }
         CgiVars env = new CgiVars(req, this.connInfo, name, pass);
-        for (int i = 0; i < env.size; i++) {
-            command.append("   var_val("+(i + 1)+ "):=?;\n");
-            command.append("   var_name("+(i + 1)+"):=?;\n");
-            params.add(env.values[i]);
-            params.add(env.names[i]);
-            
-        }
-        command.append("   owa.init_cgi_env(").append(env.size);
-        command.append(",var_name,var_val);\n ");
+       
+        command.append("   owa.init_cgi_env(?,?,?);");
+ 
         if ("4x".equalsIgnoreCase(toolkitVersion)) {
             command.append("  htp.init;\n");
         }
         // get authorization mode
         command.append("END;");
+       
         log.debug(command.toString());
-        cs = sqlconn.prepareCall(command.toString());
+        try(OracleCallableStatement cs = (OracleCallableStatement)sqlconn.prepareCall(command.toString())) {
+         for(int i=0;i<params.size(); i++) {
+            cs.setString(i+1, params.get(i));
+        }
+        int k = params.size();
+        int len = env.names.size();
+        cs.setInt(k+1,env.names.size());
+        cs.setPlsqlIndexTable(k+2, env.names.toArray(new String[0]),len,len,OracleTypes.VARCHAR,200);
+        cs.setPlsqlIndexTable(k+3, env.values.toArray(new String[0]),len,len,OracleTypes.VARCHAR,2048);
+        
         for(int i=0;i< params.size();i++) {
             cs.setString(i+1, params.get(i));
         }
         cs.execute();
-        cs.close();
-        //don't wait for garbage collector
+        }
     }
 
   /**

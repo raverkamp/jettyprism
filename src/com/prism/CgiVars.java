@@ -12,6 +12,8 @@ package com.prism;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,11 +33,16 @@ import org.apache.log4j.Logger;
 public class CgiVars {
     Logger log = Logger.getLogger(CgiVars.class);
 
-    public String[] names = new String[50];
+    public ArrayList<String> names = new ArrayList<>();
 
-    public String[] values = new String[50];
-
-    public int size = 0;
+    public ArrayList<String> values = new ArrayList<String>();
+    
+    private void add(String name, String val) {
+        if (null != val) {
+            this.names.add(name);
+            this.values.add(val);
+        }
+    }
 
     /**
    * Creates the class and stores all cgi environment variables in two arrays.
@@ -46,151 +53,57 @@ public class CgiVars {
    */
     public CgiVars(HttpServletRequest req, ConnInfo connInfo, String name,
                    String pass) {
-        int n_size = 0;
+        this.add("REQUEST_METHOD", req.getMethod());
+        this.add("PATH_INFO", req.getPathInfo());
+        this.add("PATH_TRANSLATED", req.getPathTranslated());
+        this.add("QUERY_STRING", req.getQueryString());
+        this.add("REMOTE_USER", name);
+        this.add("AUTH_TYPE", ((name.equals("") && pass.equals("")) ? req.getAuthType() : "Basic"));
+        this.add("SCRIPT_NAME", "" + req.getContextPath() + req.getServletPath());
         String argValue;
-        if ((argValue = req.getMethod()) != null) {
-            names[n_size] = "REQUEST_METHOD";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getPathInfo()) != null) {
-            names[n_size] = "PATH_INFO";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getPathTranslated()) != null) {
-            names[n_size] = "PATH_TRANSLATED";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getQueryString()) != null) {
-            names[n_size] = "QUERY_STRING";
-            values[n_size++] = argValue;
-        }
-        names[n_size] = "REMOTE_USER";
-        values[n_size++] = name;
-        if ((argValue = req.getAuthType()) != null) {
-            names[n_size] = "AUTH_TYPE";
-            values[n_size++] =
-                ((name.equals("") && pass.equals("")) ? argValue : "Basic");
-        }
-        if ((argValue = req.getHeader("AUTHORIZATION")) != null) {
-            names[n_size] = "AUTHORIZATION";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getServletPath()) != null) {
-            names[n_size] = "SCRIPT_NAME";
-            values[n_size++] = req.getContextPath() + argValue;
-        }
         if ((argValue = req.getServletPath()) != null &&
             argValue.indexOf(connInfo.connAlias) > 0) {
-            names[n_size] = "SCRIPT_PREFIX";
             argValue = req.getContextPath() + argValue;
-            values[n_size++] =
-                argValue.substring(0, argValue.indexOf(connInfo.connAlias));
+            this.add("SCRIPT_PREFIX",argValue.substring(0, argValue.indexOf(connInfo.connAlias)));
         }
-        names[n_size] = "SERVER_SOFTWARE";
-        values[n_size++] = DBPrism.NAME;
-        names[n_size] = "CONTENT_LENGTH";
-        values[n_size++] = "" + req.getContentLength();
-        if ((argValue = req.getContentType()) != null) {
-            names[n_size] = "CONTENT_TYPE";
-            values[n_size++] = argValue;
+        this.add("SERVER_SOFTWARE", DBPrism.NAME);
+        this.add("CONTENT_LENGTH",  "" + req.getContentLength());
+        this.add("CONTENT_TYPE", req.getContentType());
+        this.add("SERVER_PROTOCOL", req.getProtocol());
+        this.add("REQUEST_PROTOCOL", req.getScheme());
+        this.add("SERVER_NAME", req.getServerName());
+        this.add("SERVER_PORT", ""+ req.getServerPort());
+        this.add("REMOTE_ADDR", req.getRemoteAddr());
+        this.add("REMOTE_HOST", req.getRemoteHost());
+        this.add("REMOTE_PORT", "" + req.getRemotePort());
+        this.add("HTTP_REFERER", req.getHeader("Referer"));
+        this.add("HTTP_USER_AGENT", req.getHeader("User-Agent"));
+        this.add("HTTP_PRAGMA", req.getHeader("Pragma"));
+        this.add("HTTP_HOST", req.getHeader("Host"));
+        this.add("HTTP_ACCEPT", req.getHeader("Accept"));
+        this.add("HTTP_ACCEPT_ENCODING", req.getHeader("Accept-Encoding"));
+        this.add("HTTP_ACCEPT_LANGUAGE", req.getHeader("Accept-Language"));
+        this.add("HTTP_ACCEPT_CHARSET", req.getHeader("Accept-Charset"));
+        this.add("HTTP_IF_MODIFIED_SINCE", req.getHeader("If-Modified-Since"));
+        this.add("HTTP_COOKIE", req.getHeader("Cookie"));
+        
+        this.add("DAD_NAME",connInfo.connAlias);
+        this.add("DOC_ACCESS_PATH",connInfo.docAccessPath);
+        this.add("REQUEST_CHARSET", connInfo.dbCharset);
+        this.add("DOCUMENT_TABLE", connInfo.documentTable);
+        this.add("PLSQL_GATEWAY", DBPrism.NAME);
+        this.add("GATEWAY_IVERSION", DBPrism.VERSION);
+        this.add("REQUEST_IANA_CHARSET", connInfo.clientCharset);
+        
+        Enumeration<String> hn = req.getHeaderNames();
+        while (hn.hasMoreElements()) {
+            String headerName = hn.nextElement();
+            this.add(headerName, req.getHeader(headerName));
         }
-        if ((argValue = req.getProtocol()) != null) {
-            names[n_size] = "SERVER_PROTOCOL";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getScheme()) != null) {
-            names[n_size] = "REQUEST_PROTOCOL";
-            values[n_size++] = argValue.toUpperCase();
-        }
-        if ((argValue = req.getServerName()) != null) {
-            names[n_size] = "SERVER_NAME";
-            values[n_size++] = argValue;
-        }
-        names[n_size] = "SERVER_PORT";
-        values[n_size++] = "" + req.getServerPort();
-        if ((argValue = req.getRemoteAddr()) != null) {
-            names[n_size] = "REMOTE_ADDR";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getRemoteHost()) != null) {
-            names[n_size] = "REMOTE_HOST";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = "" +req.getRemotePort()) != null) {
-            names[n_size] = "REMOTE_PORT";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getHeader("Referer")) != null) {
-            names[n_size] = "HTTP_REFERER";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getHeader("User-Agent")) != null) {
-            names[n_size] = "HTTP_USER_AGENT";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getHeader("Pragma")) != null) {
-            names[n_size] = "HTTP_PRAGMA";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getHeader("Host")) != null) {
-            names[n_size] = "HTTP_HOST";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getHeader("Accept")) != null) {
-            names[n_size] = "HTTP_ACCEPT";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getHeader("Accept-Encoding")) != null) {
-            names[n_size] = "HTTP_ACCEPT_ENCODING";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getHeader("Accept-Language")) != null) {
-            names[n_size] = "HTTP_ACCEPT_LANGUAGE";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getHeader("Accept-Charset")) != null) {
-            names[n_size] = "HTTP_ACCEPT_CHARSET";
-            values[n_size++] = argValue;
-        }
-        if ((argValue = req.getHeader("If-Modified-Since")) != null) {
-            names[n_size] = "HTTP_IF_MODIFIED_SINCE";
-            values[n_size++] = argValue;
-            DateFormat df =
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'",
-                                                 java.util.Locale.US);
-            try {
-                java.util.Date lastClientMod = df.parse(argValue);
-                if (log.isDebugEnabled()) {
-                    log.debug("If-Modified-Since:" + lastClientMod.getTime() / 1000 *
-                                    1000);
-                }
-            } catch (ParseException e) {
-                log.warn(".CgiVars - Error parsing If-Modified-Since header", e);
-            }
-        }
-        if ((argValue = req.getHeader("Cookie")) != null) {
-            names[n_size] = "HTTP_COOKIE";
-            values[n_size++] = argValue;
-        }
-        names[n_size] = "DAD_NAME";
-        values[n_size++] = connInfo.connAlias;
-        names[n_size] = "DOC_ACCESS_PATH";
-        values[n_size++] = connInfo.docAccessPath;
-        names[n_size] = "REQUEST_CHARSET";
-        values[n_size++] = connInfo.dbCharset;
-        names[n_size] = "DOCUMENT_TABLE";
-        values[n_size++] = connInfo.documentTable;
-        names[n_size] = "PLSQL_GATEWAY";
-        values[n_size++] = DBPrism.NAME;
-        names[n_size] = "GATEWAY_IVERSION";
-        values[n_size++] = DBPrism.VERSION;
-        names[n_size] = "REQUEST_IANA_CHARSET";
-        values[n_size++] = connInfo.clientCharset;
-        size = n_size;
         if (log.isDebugEnabled()) {
             log.debug(".CgiVars dump cgi array start.");
-            for (int i = 0; i < size; i++) {
-                log.debug(" '" + names[i] + "' = '" + values[i] + "'");
+            for (int i = 0; i < this.names.size(); i++) {
+                log.debug(" '" + names.get(i) + "' = '" + values.get(i) + "'");
             }
             log.debug(".CgiVars dump cgi array end.");
         }
