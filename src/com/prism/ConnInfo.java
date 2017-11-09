@@ -51,8 +51,6 @@ public class ConnInfo {
     public java.lang.String defaultPage;
     public boolean alwaysCallDefaultPage;
     public java.lang.String customAuthentication;
-    public boolean txEnable;
-    public boolean stateLess;
     public boolean proxyUser; 
     public DBFactory factory;
     public java.lang.String clientCharset = "iso-8859-1";
@@ -110,8 +108,6 @@ public class ConnInfo {
            properties.getProperty("dbusername","","DAD_"+aliasdef);
         pass =
            properties.getProperty("dbpassword","","DAD_"+aliasdef);
-        stateLess =
-           properties.getBooleanProperty("StateLess",false,"DAD_"+aliasdef);
         errorPage =
            properties.getProperty("errorPage","/404.html","DAD_"+aliasdef);
         dynamicLoginRealm =
@@ -142,7 +138,6 @@ public class ConnInfo {
         if ( log.isDebugEnabled() ) {
             log.debug("User: " + usr );
             log.debug("pass:                  "  + pass );
-            log.debug("stateLess:             "  + stateLess );
             log.debug("errorPage:             "  + errorPage );
             log.debug("dynamicLoginRealm:     "  + dynamicLoginRealm );
             log.debug("documentTable:         "  + documentTable );
@@ -172,7 +167,6 @@ public class ConnInfo {
            properties.getProperty("type_name","OWA_UTIL","DAD_"+aliasdef);
         type_subname =
            properties.getProperty("type_subname","IDENT_ARR","DAD_"+aliasdef);
-        txEnable = false;
         status = CONN_FREE;
     }
 
@@ -226,7 +220,6 @@ public class ConnInfo {
         //System.out.println("copy ConnInfo with alias = "+connAlias);
         usr = cc_tmp.usr;
         pass = cc_tmp.pass;
-        stateLess = cc_tmp.stateLess;
         errorPage = cc_tmp.errorPage;
         errorLevel = cc_tmp.errorLevel;
         dynamicLoginRealm = cc_tmp.dynamicLoginRealm;
@@ -237,7 +230,6 @@ public class ConnInfo {
         alwaysCallDefaultPage = cc_tmp.alwaysCallDefaultPage;
         customAuthentication = cc_tmp.customAuthentication;
         factory = cc_tmp.factory;
-        txEnable = cc_tmp.txEnable;
         status = cc_tmp.status;
         connectString = cc_tmp.connectString;
         clientCharset = cc_tmp.clientCharset;

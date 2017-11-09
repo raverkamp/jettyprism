@@ -127,9 +127,9 @@ public  class DBConnection {
     String command = getSPCommand(req);
     if (log.isDebugEnabled())
       log.debug("SP command: "+command);
-    if (!connInfo.txEnable && !connInfo.stateLess) {
-      resetPackages();
-    }
+    
+    resetPackages();
+    
     setCGIVars(req, connectedUsr, pass);
     int authStatus = doAuthorize(connInfo.customAuthentication, ppackage);
     if (authStatus != 1) {
@@ -703,23 +703,22 @@ public  class DBConnection {
     * @throws Exception
     */
   public void releasePage() {
-      if (!connInfo.txEnable) {
-        // if the transaction is not enable, make the modifications.
-        if (log.isDebugEnabled())
-          log.debug("Commit normal connection");
-        try {
-          sqlconn.commit();
-        } catch (SQLException e) {
-          log.warn(".releasePage - exception on commit due: ",e);
-        } finally {
-          try {
-            if (((OracleConnection)sqlconn).isProxySession())
-              ((OracleConnection)sqlconn).close(((OracleConnection)sqlconn).PROXY_SESSION);
-          } catch (SQLException s) {
-            log.warn(".releasePage - exception closing proxy session: ",s);
-          }
-        }
+    
+    // if the transaction is not enable, make the modifications.
+    if (log.isDebugEnabled())
+      log.debug("Commit normal connection");
+    try {
+      sqlconn.commit();
+    } catch (SQLException e) {
+      log.warn(".releasePage - exception on commit due: ",e);
+    } finally {
+      try {
+        if (((OracleConnection)sqlconn).isProxySession())
+          ((OracleConnection)sqlconn).close(((OracleConnection)sqlconn).PROXY_SESSION);
+      } catch (SQLException s) {
+        log.warn(".releasePage - exception closing proxy session: ",s);
       }
+    }
   }
   
   /**
@@ -765,9 +764,9 @@ public  class DBConnection {
     String ppackage = getPackage(req);
     /* String pprocedure = */
     getProcedure(req);
-    if (!connInfo.txEnable && !connInfo.stateLess) {
-      resetPackages();
-    }
+   
+    resetPackages();
+    
     setCGIVars(req, connectedUsr, pass);
     int authStatus = doAuthorize(connInfo.customAuthentication, ppackage);
     if (authStatus != 1) {

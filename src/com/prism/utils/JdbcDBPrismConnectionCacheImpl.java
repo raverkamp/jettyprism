@@ -245,7 +245,6 @@ public class JdbcDBPrismConnectionCacheImpl implements java.lang.Runnable, DBPri
         TxId = connection.toString(); // Store connection id as TxId
         counter = connectionTimeOut; // How much wait for unused connection
         connection.connInfo = cc_tmp; // Set default values for ConnInfo object
-        connection.connInfo.txEnable = false; // begun as direct connection
         connection.connInfo.status = ConnInfo.CONN_DIR;
 	if (log.isDebugEnabled()) {
             log.debug("connectString: " + cc_tmp.connectString );
@@ -389,7 +388,6 @@ public class JdbcDBPrismConnectionCacheImpl implements java.lang.Runnable, DBPri
         if (timeOut > 0) {
             // Reclaim TX connection
             rtmp.counter = timeOut;
-            rtmp.connection.connInfo.txEnable = true;
             rtmp.connection.connInfo.status = ConnInfo.CONN_TX;
             HttpSession ss = req.getSession(true);
             rtmp.TxId = ss.getId();
@@ -398,7 +396,6 @@ public class JdbcDBPrismConnectionCacheImpl implements java.lang.Runnable, DBPri
         } else {
             // Reclaim Direct connection
             rtmp.counter = connectionTimeOut;
-            rtmp.connection.connInfo.txEnable = false;
             rtmp.connection.connInfo.status = ConnInfo.CONN_DIR;
             if (log.isDebugEnabled())
                 log.debug(".getConnection DirectConn TxId:" + rtmp.TxId);
@@ -460,7 +457,6 @@ public class JdbcDBPrismConnectionCacheImpl implements java.lang.Runnable, DBPri
                 res.TxId = res.connection.toString();
                 res.counter = connectionTimeOut;
                 res.connection.connInfo.status = ConnInfo.CONN_FREE;
-                res.connection.connInfo.txEnable = false;
                 res.connection.sqlconn.setAutoCommit(false);
                 FreeList.put(res.TxId, res);
             }
