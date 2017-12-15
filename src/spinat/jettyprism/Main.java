@@ -23,6 +23,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Locale;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.jetty.server.Server;
@@ -39,6 +40,8 @@ public class Main {
     }
     
     public static void main(String[] args) throws Exception {
+        // it would be better nicer use ROOT, Oracle JDBC does not like that
+         Locale.setDefault(Locale.US);
         
         if (args.length < 1) {
             throw new RuntimeException("Expecting one argument, the name of the configuration file");

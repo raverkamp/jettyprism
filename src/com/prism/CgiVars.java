@@ -89,7 +89,6 @@ public class CgiVars {
         
         this.add("DAD_NAME",connInfo.connAlias);
         this.add("DOC_ACCESS_PATH",connInfo.docAccessPath);
-        this.add("REQUEST_CHARSET", connInfo.dbCharset);
         this.add("DOCUMENT_TABLE", connInfo.documentTable);
         this.add("PLSQL_GATEWAY", DBPrism.NAME);
         this.add("GATEWAY_IVERSION", DBPrism.VERSION);

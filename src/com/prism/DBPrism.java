@@ -11,7 +11,6 @@ package com.prism;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
@@ -51,8 +50,6 @@ public class DBPrism {
     private static java.lang.String CONFIGURATION = "prism.xconf";  // JHK this string should only appear once in this file.
     public static java.lang.String PROPERTIES = "/" + CONFIGURATION;
     public static java.lang.String CONTENTTYPE = "text/html";
-    public static java.lang.String LANG = null;
-    public static java.lang.String COUNTRY = null;
     public static java.lang.String UnauthorizedText;
     public static int maxUploadSize = 8192 * 1024;
     public static int BEHAVIOR = 0;
@@ -294,8 +291,8 @@ public class DBPrism {
             throw new IOException("Can't load properties file '" + propFileName + "'\n Make sure properties file in CLASSPATH" + "\n or give 'properties' argument in Servlet Config");
         }
         // Set global DB Prism variables
-        LANG = properties.getProperty("lang");
-        COUNTRY = properties.getProperty("country");
+        //LANG = properties.getProperty("lang");
+        //COUNTRY = properties.getProperty("country");
         
         CONTENTTYPE = properties.getProperty("contenttype", "text/html");
         UnauthorizedText = properties.getProperty("UnauthorizedText", "You must be enter DB username and password to access at the system");
@@ -303,10 +300,6 @@ public class DBPrism {
         maxUploadSize = properties.getIntProperty("maxUploadSize", 8388608);
         cachep = properties.getBooleanProperty("cacheprocedure", true);
         proccache = new DBProcedure(cachep);
-        if (LANG != null && COUNTRY != null) {
-            Locale.setDefault(new Locale(LANG, COUNTRY));
-            log.info("Locale setting: " + Locale.getDefault().getDisplayName());
-        }
         try {
             cache = DBPrismConnectionCacheProxy.getInstance(properties);
         } catch (Exception e) {

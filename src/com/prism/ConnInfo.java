@@ -54,7 +54,7 @@ public class ConnInfo {
     public boolean proxyUser; 
     public DBFactory factory;
     public java.lang.String clientCharset = "iso-8859-1";
-    public java.lang.String dbCharset = "iso-8859-1";
+    //public java.lang.String dbCharset = "iso-8859-1";
     private static Configuration properties;
     public int status = CONN_FREE;
     // owa_public.owa_util.ident_arr information for 7x support
@@ -159,8 +159,6 @@ public class ConnInfo {
         
         clientCharset =
            properties.getProperty("clientcharset","iso-8859-1","DAD_"+aliasdef);
-        dbCharset =
-           properties.getProperty("dbcharset","iso-8859-1","DAD_"+aliasdef);
         type_owner =
            properties.getProperty("type_owner","OWA_PUBLIC","DAD_"+aliasdef);
         type_name =
@@ -232,8 +230,6 @@ public class ConnInfo {
         factory = cc_tmp.factory;
         status = cc_tmp.status;
         connectString = cc_tmp.connectString;
-        clientCharset = cc_tmp.clientCharset;
-        dbCharset = cc_tmp.dbCharset;
         type_owner = cc_tmp.type_owner;
         type_name = cc_tmp.type_name;
         type_subname = cc_tmp.type_subname;

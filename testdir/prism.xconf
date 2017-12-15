@@ -97,7 +97,6 @@
     <property name="connectString" value="${demo.db}"/>
     <property name="errorLevel" value="0"/>
     <property name="errorPage" value="/404.html"/>
-    <property name="dbcharset" value="iso-8859-1"/>
     <property name="clientcharset" value="iso-8859-1"/>
     <property name="dynamicLoginRealm" value="new DB Login"/>
     
@@ -132,28 +131,6 @@
       Default 600
     -->
     <property name="timeout" value="600"/>
-    
-    <!--
-      New in version 1.2.0
-      Defines which implementation uses for allocating connection
-      This parameter is MANDATORY
-      Values:
-        - com.prism.utils.JdbcDBPrismConnectionCacheImpl
-        - com.prism.oracle.JTADBPrismConnectionCacheImpl
-      com.prism.utils.JdbcDBPrismConnectionCacheImpl has the same functionality as
-      DB Prism 1.1.x ResourceManager class
-      com.prism.oracle.JTADBPrismConnectionCacheImpl is implemented using the new
-      functionality of Oracle JDBC 2.0 optional package includes into oracle version 8.1.6+
-      but JDBC 8.1.7+ drivers is highly recomended due to several bugs into 8.1.6
-      com.prism.utils.JndiDBPrismConnectionCacheImpl Connection Caching using
-      JNDI Datasources defined into a J2EE container (data-sources.xml file)
-
-    <property name="class" value="com.prism.utils.JndiDBPrismConnectionCacheImpl"/>
-    <property name="class" value="com.prism.utils.JdbcDBPrismConnectionCacheImpl"/>
-    <property name="class" value="com.prism.oracle.UCPDBPrismConnectionCacheImpl"/>
-    -->
-    <!--<property name="class" value="com.prism.oracle.JTADBPrismConnectionCacheImpl"/-->
-    <property name="class" value="com.prism.utils.JdbcDBPrismConnectionCacheImpl"/>
     
   </category>
 
