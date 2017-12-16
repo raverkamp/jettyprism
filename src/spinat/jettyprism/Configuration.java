@@ -33,7 +33,6 @@ public class Configuration {
     }
 
     final HashMap<String, Category> categories;
-    //final HashMap<String, String> variables;
     final HashMap<String, String> general;
     
     public static Configuration loadFromPropertiesFile(String fileName) throws IOException {
@@ -110,13 +109,6 @@ public class Configuration {
         return general.get(name);
     }
 
-//    public void setProperty(String s1, String s2) {
-//        throw new UnsupportedOperationException();
-//    }
-//
-//    public void setProperty(String s1, String s2, String s3) {
-//        throw new UnsupportedOperationException();
-//    }
     public boolean getBooleanProperty(String name, boolean default_, String cat) {
         String s = getPropertyi(name, cat);
         if (null == s) {
@@ -164,88 +156,7 @@ public class Configuration {
             return Integer.parseInt(s);
         }
     }
-
-//    public void setCategory(String s) {
-//        throw new UnsupportedOperationException();
-//    }
-    static XMLEvent peekTag(XMLEventReader er) throws XMLStreamException {
-        if (!er.hasNext()) {
-            return null;
-        }
-        while (true) {
-            XMLEvent e = er.peek();
-            if (e == null) {
-                return null;
-            }
-            if (e.isCharacters()) {
-                if (e.asCharacters().isWhiteSpace()) {
-                    er.nextEvent(); // skip
-                } else {
-                    throw new RuntimeException("text entity is not only whitespace at " + e.getLocation());
-                }
-            } else if (e.isProcessingInstruction() || e.getEventType() == XMLStreamConstants.COMMENT) {
-                er.nextEvent();
-            } else {
-                return e;
-            }
-        }
-    }
-
-    static String getProperty(StartElement e, String name) throws XMLStreamException {
-        Attribute a = e.getAttributeByName(new QName(name));
-        if (a == null) {
-            throw new XMLStreamException("expecting attribute " + name + " on element " + e, e.getLocation());
-        } else {
-            return a.getValue();
-        }
-    }
-
-    public static HashMap<String, String> parseVariables(XMLEventReader xsr) throws XMLStreamException {
-        XMLEvent e = xsr.nextTag(); // this should be the starter
-        HashMap<String, String> m = new HashMap<String, String>();
-        while (true) {
-            XMLEvent e2 = xsr.nextTag();
-            if (e2.isEndElement() && e2.asEndElement().getName().getLocalPart().equals("variables")) {
-                return m;
-            } else if (e2.isStartElement() && e2.asStartElement().getName().getLocalPart().equals("variable")) {
-                String name = getProperty(e2.asStartElement(), "name");
-                String value = getProperty(e2.asStartElement(), "value");
-                m.put(name, value);
-                XMLEvent e3 = xsr.nextTag();
-                if (!(e3.isEndElement() && e3.asEndElement().getName().getLocalPart().equals("variable"))) {
-                    throw new XMLStreamException("expecting variable end", e3.getLocation());
-                }
-            } else {
-                throw new XMLStreamException("expecting new variable or variables end", e2.getLocation());
-            }
-        }
-    }
-
-
-    public static Category parseCategory(XMLEventReader xsr) throws XMLStreamException {
-        XMLEvent e = xsr.nextTag(); // this should be the starter
-        String catName = getProperty(e.asStartElement(), "name");
-        HashMap<String, String> m = new HashMap<String, String>();
-        System.out.println("category: " + catName);
-        while (true) {
-            XMLEvent e2 = xsr.nextTag();
-            if (e2.isEndElement() && e2.asEndElement().getName().getLocalPart().equals("category")) {
-                return new Category(catName, m);
-            } else if (e2.isStartElement() && e2.asStartElement().getName().getLocalPart().equals("property")) {
-                String name = getProperty(e2.asStartElement(), "name");
-                String value = getProperty(e2.asStartElement(), "value");
-                m.put(name, value);
-                System.out.println(" " + name + ": " + value);
-                XMLEvent e3 = xsr.nextTag();
-                if (!(e3.isEndElement() && e3.asEndElement().getName().getLocalPart().equals("property"))) {
-                    throw new XMLStreamException("expecting property end", e3.getLocation());
-                }
-            } else {
-                throw new XMLStreamException("expecting new category or end", e2.getLocation());
-            }
-        }
-    }
-
+  
     public String toString() {
         StringBuilder b = new StringBuilder();
         b.append("--- categories ---\n");
@@ -255,58 +166,5 @@ public class Configuration {
             }
         }
         return b.toString();
-    }
-
-    public static Configuration load(String filename) throws Exception {
-        XMLInputFactory xinf = XMLInputFactory.newFactory();
-        xinf.setProperty("javax.xml.stream.isReplacingEntityReferences", true);
-        FileInputStream is = new FileInputStream(filename);
-        XMLEventReader xsr = xinf.createXMLEventReader(is);
-        return load(xsr);
-    }
-
-    public static Configuration loadFromString(String s) throws Exception {
-        Reader r = new StringReader(s);
-        XMLInputFactory xinf = XMLInputFactory.newFactory();
-        xinf.setProperty("javax.xml.stream.isReplacingEntityReferences", true);
-        XMLEventReader xsr = xinf.createXMLEventReader(r);
-        return load(xsr);
-    }
-
-    public static Configuration load(XMLEventReader xsr) throws Exception {
-        XMLEvent e = xsr.nextEvent();
-        if (e.getEventType() != XMLStreamConstants.START_DOCUMENT) {
-            throw new RuntimeException("aua");
-        }
-        final HashMap<String, String> vm;
-        final HashMap<String, Category> cm = new HashMap<String, Category>();
-        XMLEvent e1 = xsr.nextTag();
-        if (e1.isStartElement()
-                && e1.asStartElement().getName().getLocalPart().equals("properties")) {
-            XMLEvent e2 = peekTag(xsr);
-
-            if (e2.isStartElement()
-                    && e2.asStartElement().getName().getLocalPart().equals("variables")) {
-                vm = parseVariables(xsr);
-            } else {
-                vm = new HashMap<String, String>();
-            }
-            while (true) {
-                // now parsing categories
-                XMLEvent ec = peekTag(xsr);
-                System.out.println(ec.getClass());
-                if (ec.isStartElement() && ec.asStartElement().getName().getLocalPart().equals("category")) {
-                    Category c = parseCategory(xsr);
-                    cm.put(c.name, c);
-                } else if (ec.isEndElement() && ec.asEndElement().getName().getLocalPart().equals("properties")) {
-                    XMLEvent ignore = xsr.nextTag();
-                    break;
-                }
-            }
-
-        } else {
-            throw new RuntimeException("expecting properties");
-        }
-        return new Configuration(cm, vm);
     }
 }
