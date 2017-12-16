@@ -288,7 +288,8 @@ public class DBPrism {
         //  ConfigurationManager cm = ConfigurationManager.getInstance();
         try {
             // LXG: changed to static access
-            properties = Configuration.load(filename);    //ConfigurationManager.getConfiguration("prism.xconf");
+            properties = Configuration.loadFromPropertiesFile(filename);    //ConfigurationManager.getConfiguration("prism.xconf");
+            System.out.println(properties.toString());
         } catch (Exception e) {
             log.error(".init Could not load properties file: " + propFileName, e);
             // LXG: use the correct file name when throwing the error

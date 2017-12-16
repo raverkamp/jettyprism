@@ -1,6 +1,9 @@
 package spinat.jettyprism;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -17,15 +20,49 @@ import javax.xml.stream.events.XMLEvent;
 // a simple replacement for JConfiguration or so
 
 public class Configuration {
+    
+    public static class Category {
+
+        final String name;
+        final HashMap<String, String> map;
+
+        public Category(String name, HashMap<String, String> map) {
+            this.name = name;
+            this.map = map;
+        }
+    }
 
     final HashMap<String, Category> categories;
-    final HashMap<String, String> variables;
+    //final HashMap<String, String> variables;
     final HashMap<String, String> general;
+    
+    public static Configuration loadFromPropertiesFile(String fileName) throws IOException {
+        java.util.Properties props = new java.util.Properties();
+        try (InputStream ins = new FileInputStream(fileName)) {
+           props.load(ins);
+        }
+        HashMap<String,Category> cats = new HashMap<>();
+        for(String key : props.stringPropertyNames()) {
+            int p = key.indexOf(".");
+            int p2 = key.lastIndexOf(".");
+            // exactly one . in string
+            if (p<0 || p!=p2) {
+                continue;
+            }
+            String cat = key.substring(0,p);
+            String subkey= key.substring(p+1);
+            
+            if (!cats.containsKey(cat)) {
+                cats.put(cat, new Category(cat,new HashMap<String, String>()));
+            }
+            cats.get(cat).map.put(subkey,(String) props.getProperty(key));
+        }
+        return new Configuration(cats,null);
+    }
 
     private Configuration(HashMap<String, Category> categories,
             HashMap<String, String> variables) {
         this.categories = categories;
-        this.variables = variables;
         if (categories.containsKey("general")) {
             general = categories.get("general").map;
         } else {
@@ -184,16 +221,6 @@ public class Configuration {
         }
     }
 
-    public static class Category {
-
-        final String name;
-        final HashMap<String, String> map;
-
-        public Category(String name, HashMap<String, String> map) {
-            this.name = name;
-            this.map = map;
-        }
-    }
 
     public static Category parseCategory(XMLEventReader xsr) throws XMLStreamException {
         XMLEvent e = xsr.nextTag(); // this should be the starter
@@ -221,10 +248,6 @@ public class Configuration {
 
     public String toString() {
         StringBuilder b = new StringBuilder();
-        b.append("--- variables ---\n");
-        for (Map.Entry<String, String> kv : this.variables.entrySet()) {
-            b.append(kv.getKey() + " : " + kv.getValue() + "\n");
-        }
         b.append("--- categories ---\n");
         for (Map.Entry<String, Category> cm : this.categories.entrySet()) {
             for (Map.Entry<String, String> x : cm.getValue().map.entrySet()) {
