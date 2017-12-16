@@ -132,8 +132,12 @@ public class DBPrism {
                         log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                     }
                 } catch (SQLException e) {
-                    log.debug(e);
-                    throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
+                    if (e.getErrorCode() == 1017) {
+                        //ORA-01017: invalid username/password; logon denied. 
+                        throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
+                    }
+                    log.error("connect failed", e);
+                    throw e;
                 }
             }
             connection.doCall(req, name, password);
