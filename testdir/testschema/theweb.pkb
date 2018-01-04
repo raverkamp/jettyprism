@@ -43,9 +43,16 @@ htp.p('<input type=text name="d">');
 htp.p('<input type="submit">');
 htp.p('</form>');
 
+htp.p('<ul>');
+htp.p('<li>');
 htp.p('<a href="./theweb.gen_excel">Excel </a><br>');
+htp.p('</li>');htp.p('<li>');
 htp.p('<a href="./theweb.show_info">Header-Info</a>');
-
+htp.p('</li>');htp.p('<li>');
+htp.p('<a href="./theweb.gen_excel2">Gen Excel</a>');
+htp.p('</li>');htp.p('<li>');
+htp.p('<a href="./theweb.tables_demo">Tables Demo</a>');
+htp.p('</li>');
 htp.p('</div>');
 
 htp.bodyclose;
@@ -145,6 +152,112 @@ htp.htmlclose;
 
 end;
 
+procedure gen_excel2 is
+begin
+HTP.HTMLOPEN;
+htp.headopen;
+htp.p('<script type="text/javascript" src="https://cdn.rawgit.com/jsegarra1971/MyExcel/28fc1471/FileSaver.js"></script>');
+htp.p('<script type="text/javascript" src="https://cdn.rawgit.com/jsegarra1971/MyExcel/28fc1471/jszip.js"></script>');
+htp.p('<script type="text/javascript" src="https://cdn.rawgit.com/jsegarra1971/MyExcel/28fc1471/myexcel.js"></script>');
+htp.headclose;
+htp.bodyopen;
+htp.p('<button onclick="genexcel()">Los</button>');
+  htp.p(q'[<script>
+  "use strict";
+  function genexcel() {
+      var excel = $JExcel.new("Calibri light 10 #333333");
+      excel.set( {sheet:0,value:"This is Sheet 1" } );
+      excel.set(0,3,2,"Row 3, column2");
+      excel.generate("SampleData.xlsx");
+     
+  }
+  
+  </script>]');
+
+htp.bodyclose;
+htp.htmlclose;
+  
 end;
 
+procedure query_tables(pat varchar2) is
+  c sys_refcursor;
+begin
+ open c for select * from all_tab_columns t 
+ where t.table_name like upper(pat)||'%' order by t.OWNER, table_name,t.COLUMN_ID;
+ TO_JSON.CURSOR_TO_JSON(c);
+end;
+
+procedure tables_demo is
+begin
+HTP.HTMLOPEN;
+htp.headopen;
+htp.p('<script type="text/javascript" src="https://cdn.rawgit.com/jsegarra1971/MyExcel/28fc1471/FileSaver.js"></script>');
+htp.p('<script type="text/javascript" src="https://cdn.rawgit.com/jsegarra1971/MyExcel/28fc1471/jszip.js"></script>');
+htp.p('<script type="text/javascript" src="https://cdn.rawgit.com/jsegarra1971/MyExcel/28fc1471/myexcel.js"></script>');
+htp.headclose;
+htp.bodyopen;
+htp.p('<h1>Enter a table name!</h1>');
+htp.p('<input id="tab" type="text"></input>');
+htp.p('<button onclick="genexcel()">Los!</button>');
+htp.p(q'[<script>
+"use strict";
+  
+function to_query(obj) {
+  var str = [];
+  for(var p in obj)
+    if (obj.hasOwnProperty(p)) {
+      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+    }
+  return str.join("&");
+}
+  
+function exec_query(url, obj) {
+   var req = new XMLHttpRequest();
+   var q = to_query(obj);
+   req.open("GET", url +"?" + q , false);
+   req.send();
+   if (req.status !== 200) {
+        alert("JSON ERROR");
+        console.log(req.responseText);
+        throw "JSON ERROR";
+    }
+    var txt = req.responseText;
+    var res = JSON.parse(txt);
+    return res;
+}
+
+  function genexcel() {
+    var input = document.getElementById("tab");
+    var v = input.value;
+    var res = exec_query('./theweb.query_tables', {"pat": v});
+    console.log(res);
+    var excel = $JExcel.new("Calibri light 10 #333333");
+    excel.set( {sheet:0,value:"These are the tables" } );
+    var headers = ["Owner", "Table Name", "Column Name", "Data Type", "Data Length"];
+    var formatHeader=excel.addStyle ( { 															// Format for headers
+					border: "none,none,none,thin #333333", 													// 		Border for header
+					font: "Calibri 12 #0000AA B"}); 														// 		Font for headers
+			for (var i=0;i<headers.length;i++){																// Loop all the haders
+				excel.set(0,i,0,headers[i],formatHeader);													// Set CELL with header text, using header format
+				excel.set(0,i,undefined,"auto");															// Set COLUMN width to auto (according to the standard this is only valid for numeric columns)
+			}
+    var numStyle = excel.addStyle({align: "R"});
+    for(var i = 0;i<res.length;i++) {
+      excel.set(0,0,i+1, res[i].owner);
+      excel.set(0,1,i+1, res[i].table_name);
+      excel.set(0,2,i+1, res[i].column_name);
+      excel.set(0,3,i+1, res[i].data_type);
+      excel.set(0,4,i+1, "'" +res[i].data_length);//, numStyle);  
+    }
+    excel.generate("tables.xlsx");
+  }
+  
+  </script>]');
+
+htp.bodyclose;
+htp.htmlclose;
+ 
+end;
+
+end;
 /

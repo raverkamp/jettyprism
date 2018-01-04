@@ -1,7 +1,7 @@
 
 
 this work now
-http://localhost:8080/dads/user_jp/theweb.test1
+http://localhost:8888/dads/user_jp/theweb.menu
 
 set java_home=C:\Program Files\Java\jdk1.7.0_21
 

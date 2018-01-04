@@ -15,5 +15,11 @@ procedure gen_excel;
 
 procedure show_info;
 
+procedure gen_excel2;
+
+procedure query_tables(pat varchar2);
+
+procedure tables_demo ;
+
 end;
 /
