@@ -36,15 +36,15 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 public class Main {
-    
+
     private static void msg(String s) {
         System.out.println("### " + s);
     }
-    
+
     public static void main(String[] args) throws Exception {
         // it would be better nicer use ROOT, Oracle JDBC does not like that
-         Locale.setDefault(Locale.US);
-        
+        Locale.setDefault(Locale.US);
+
         if (args.length < 1) {
             throw new RuntimeException("Expecting one argument, the name of the configuration file");
         }
@@ -58,10 +58,10 @@ public class Main {
         File dpf = apf.getParentFile();
         msg("setting user.dir to " + dpf.toString());
         System.setProperty("user.dir", dpf.toString());
-        
+
         FileReader fr = new FileReader(apf);
         props.load(fr);
-        
+
         String log4jprops = props.getProperty("log4jconfig", "");
         if (log4jprops.equals("")) {
             log4jprops = "log4j.properties";
@@ -70,41 +70,45 @@ public class Main {
         URL l4ju = l4jf.toURI().toURL();
         msg("log4j config file " + l4jf);
         PropertyConfigurator.configure(l4ju);
-        
+
         String port = props.getProperty("port", "");
         int intPort;
         if (port.equals("")) {
-            intPort = 8080;
+            String portEnv = System.getenv().get("JETTYPRISM_PORT").trim();
+            if (portEnv == null || portEnv.isEmpty()) {
+                intPort = 8080;
+            } else {
+                intPort = Integer.parseInt(portEnv);
+            }
         } else {
             intPort = Integer.parseInt(port);
         }
         msg("using port " + intPort);
-        
+
         final Server server;
-        String only_local = props.getProperty("only_local","1");
-        if (only_local.equalsIgnoreCase("N")||only_local.equalsIgnoreCase("NO") 
-                || only_local.equalsIgnoreCase("F") ||only_local.equalsIgnoreCase("FALSE")
-                ||only_local.equalsIgnoreCase("0")) {
-           msg("using all addressses");
-           server = new Server(intPort);    
+        String only_local = props.getProperty("only_local", "1");
+        if (only_local.equalsIgnoreCase("N") || only_local.equalsIgnoreCase("NO")
+                || only_local.equalsIgnoreCase("F") || only_local.equalsIgnoreCase("FALSE")
+                || only_local.equalsIgnoreCase("0")) {
+            msg("using all addressses");
+            server = new Server(intPort);
         } else {
-            
-          InetAddress iadr = InetAddress.getLoopbackAddress();
-          msg("using address " + iadr);
-          InetSocketAddress siadr = new InetSocketAddress(iadr,intPort);
-          server = new Server(siadr);
+
+            InetAddress iadr = InetAddress.getLoopbackAddress();
+            msg("using address " + iadr);
+            InetSocketAddress siadr = new InetSocketAddress(iadr, intPort);
+            server = new Server(siadr);
         }
-        
+
         // Create a basic jetty server object that will listen on port 8080.  Note that if you set this to port 0
         // then a randomly available port will be assigned that you can either look in the logs for the port,
         // or programmatically obtain it for use in test cases.
-        
         HandlerList handlers = new HandlerList();
-        
+
         Handler dadHandler = createDADHandler(props, apf);
-           
+
         ArrayList<Handler> l = createStaticHandler(props);
-        for(Handler h : l) {
+        for (Handler h : l) {
             handlers.addHandler(h);
         }
         // if dadHandler is added first, the static handlers are not visible
@@ -124,7 +128,7 @@ public class Main {
         }
         server.join();
     }
-    
+
     static Handler createDADHandler(java.util.Properties props, File propertyFile) {
         ServletContextHandler handler = new ServletContextHandler();
         // Passing in the class for the servlet allows jetty to instantite an instance of that servlet and mount it
@@ -145,7 +149,7 @@ public class Main {
         handler.addServlet(holder, dads + "/*");
         return handler;
     }
-    
+
     static ArrayList<Handler> createStaticHandler(java.util.Properties props) {
         ArrayList<Handler> res = new ArrayList<>();
         HashSet<String> set = new HashSet<>();
@@ -178,16 +182,16 @@ public class Main {
                 throw new RuntimeException("not a dir " + f);
             }
             String targetDir = f.getAbsolutePath();
-            
+
             String mount = props.getProperty(prefix + "wdir", "");
             if (mount.equals("")) {
                 continue;
             }
-            
+
             ResourceHandler resource_handler = new ResourceHandler();
             resource_handler.setDirectoriesListed(true);
             resource_handler.setResourceBase(targetDir);
-            
+
             String cc = props.getProperty(prefix + "cache-control", "");
             if (!cc.equals("")) {
                 resource_handler.setCacheControl(cc);
@@ -198,7 +202,7 @@ public class Main {
             res.add(contextHandler);
         }
         return res;
-        
+
     }
-    
+
 }

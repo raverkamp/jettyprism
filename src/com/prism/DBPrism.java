@@ -167,10 +167,10 @@ public class DBPrism {
 
     /**
      * Makes a download from Request If the request has no user/pass information
-     * and the connection is with dymanic login throw NotAuthorizedException. If
+     * and the connection is with dynamic login throw NotAuthorizedException. If
      * it is not possible to establish the connection throw
      * NotAuthorizedException. If there is error in the page generation,
-     * according to the kind of errors the responsability is forwarded to the
+     * according to the kind of errors the responsibility is forwarded to the
      * wrappers This step free the connection, different from makePage which
      * free the connection in getPage step
      *
