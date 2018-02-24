@@ -100,3 +100,8 @@ oder
 log4j.rootLogger=DEBUG, A1
 
 die INFO einstellung ist beseer
+
+
+* aktuelle URL:
+http://localhost:8888/dads/user_jp/theweb.menu
+

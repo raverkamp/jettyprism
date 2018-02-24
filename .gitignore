@@ -2,4 +2,4 @@
 /build/*
 /dist/*
 /nbproject/private/*
-/libs/ojdbc7.jar
+/libs/ojdbc8.jar
