@@ -37,7 +37,7 @@ public  class DBFactory {
     // LXG: call to super is generated anyway but put it here for clarity.
     super();
   }
-public SPProc createSPProc(ConnInfo conn, String procname, Connection sqlconn) throws SQLException {
+public SPProc createSPProc(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
         SPProc cc = new SPProc();
         return cc.create(conn, procname, sqlconn);
     }

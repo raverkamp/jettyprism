@@ -104,6 +104,10 @@ public class ServletWrapper extends HttpServlet {
             }
         } catch (NotAuthorizedException ne) {
             sendUnauthorized(res, ne.getMessage());
+        } catch(ProcedureNotFoundException e) {
+                sendFailureMsg(res, e.getMessage());
+        } catch(ExecutionException e) {
+                sendFailureMsg(res, e.getMessage());
         } catch (Exception e) {
             String emsg = e.getMessage();
             if (emsg == null) {

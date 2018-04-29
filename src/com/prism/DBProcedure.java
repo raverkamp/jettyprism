@@ -23,7 +23,7 @@ public class DBProcedure extends Hashtable {
     }
 
     /** Gets or creates a instance of DBProcedure objects from cache. */
-    public SPProc get(ConnInfo conn, String procname, Connection sqlconn) throws SQLException {
+    public SPProc get(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
         SPProc plp = (SPProc)get(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname);
         if (plp == null) { // plp is not in cache yet
             DBFactory ff = conn.getFactory();

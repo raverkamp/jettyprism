@@ -50,8 +50,12 @@ htp.p('</li>');htp.p('<li>');
 htp.p('<a href="./theweb.show_info">Header-Info</a>');
 htp.p('</li>');htp.p('<li>');
 htp.p('<a href="./theweb.gen_excel2">Gen Excel</a>');
-htp.p('</li>');htp.p('<li>');
+htp.p('</li>');
+htp.p('<li>');
 htp.p('<a href="./theweb.tables_demo">Tables Demo</a>');
+htp.p('</li>');
+htp.p('<li>');
+htp.p('<a href="./theweb.error">Exception</a>');
 htp.p('</li>');
 htp.p('</div>');
 
@@ -257,6 +261,11 @@ function exec_query(url, obj) {
 htp.bodyclose;
 htp.htmlclose;
  
+end;
+
+procedure error is
+begin
+  raise_application_error(-20000,'exception in procedure');
 end;
 
 end;

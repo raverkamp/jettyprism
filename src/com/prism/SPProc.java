@@ -122,84 +122,94 @@ public class SPProc {
      * @return SPProc
      * @throws SQLException
      */
-    public SPProc create(ConnInfo conn, String procname, Connection sqlconn) throws SQLException {
+    public SPProc create(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
         if (log.isDebugEnabled()) {
             log.debug(".create overload for: '" + procname + "'");
         }
         SPProc plp = new SPProc();
-        CallableStatement css = sqlconn.prepareCall("BEGIN \n dbms_utility.name_resolve(?,1,?,?,?,?,?,?); \nEND;");
-        css.setString(1, procname);
-        css.registerOutParameter(2, Types.VARCHAR);
-        css.registerOutParameter(3, Types.VARCHAR);
-        css.registerOutParameter(4, Types.VARCHAR);
-        css.registerOutParameter(5, Types.VARCHAR);
-        css.registerOutParameter(6, Types.VARCHAR);
-        css.registerOutParameter(7, Types.VARCHAR);
-        css.execute();
-        String owner = css.getString(2);
-        String plpackage = css.getString(3);
-        String plprocedure = css.getString(4);
-        css.close();
+        final String owner;
+        final String plpackage;
+        final String plprocedure;
+        try (CallableStatement css = sqlconn.prepareCall("BEGIN \n dbms_utility.name_resolve(?,1,?,?,?,?,?,?); \nEND;")) {
+            css.setString(1, procname);
+            css.registerOutParameter(2, Types.VARCHAR);
+            css.registerOutParameter(3, Types.VARCHAR);
+            css.registerOutParameter(4, Types.VARCHAR);
+            css.registerOutParameter(5, Types.VARCHAR);
+            css.registerOutParameter(6, Types.VARCHAR);
+            css.registerOutParameter(7, Types.VARCHAR);
+            css.execute();
+            owner = css.getString(2);
+            plpackage = css.getString(3);
+            plprocedure = css.getString(4);
+        }
         String columnNames = "argument_name, overload, data_type, type_owner, type_name, type_subname";
         if (plpackage == null) {
             throw new RuntimeException("procedure must be member of package");
         }
-        PreparedStatement cs = sqlconn.prepareStatement("SELECT " + columnNames + " FROM all_arguments WHERE "
-                + " owner = ? AND package_name = ? AND object_name = ? " + " ORDER BY overload,sequence");
-        if (log.isDebugEnabled()) {
-            log.debug("Resolving package.procedure call");
-            log.debug("Excuting: SELECT " + columnNames + " FROM all_arguments WHERE "
-                    + " owner = ? AND package_name = ? AND object_name = ? " + " ORDER BY overload,sequence");
-            log.debug("With arg 1: " + owner);
-            log.debug("With arg 2: " + plpackage);
-            log.debug("With arg 3: " + plprocedure);
-        }
-        cs.setString(1, owner);
-        cs.setString(2, plpackage);
-        cs.setString(3, plprocedure);
+        try (
+                PreparedStatement cs = sqlconn.prepareStatement("SELECT " + columnNames + " FROM all_arguments WHERE "
+                        + " owner = ? AND package_name = ? AND object_name = ? " + " ORDER BY overload,sequence")) {
+            if (log.isDebugEnabled()) {
+                log.debug("Resolving package.procedure call");
+                log.debug("Excuting: SELECT " + columnNames + " FROM all_arguments WHERE "
+                        + " owner = ? AND package_name = ? AND object_name = ? " + " ORDER BY overload,sequence");
+                log.debug("With arg 1: " + owner);
+                log.debug("With arg 2: " + plpackage);
+                log.debug("With arg 3: " + plprocedure);
+            }
+            cs.setString(1, owner);
+            cs.setString(2, plpackage);
+            cs.setString(3, plprocedure);
+            boolean exists = false;
+            try (ResultSet rs = cs.executeQuery()) {
+                String old_overload = "something";
+                while (rs.next()) {
+                    exists = true;
+                    String argument_name = rs.getString(1);
+                    String overload = rs.getString(2);
+                    if (overload == null) { // There is no overloading
+                        overload = "1";
+                    }
+                    if (!old_overload.equals(overload)) {
+                        plp.addProcedure(overload);
+                        old_overload = overload;
+                    }
+                    // if procedure has no argument, empty row is returned
+                    if (argument_name == null) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("            overload: " + overload + " no argument");
+                        }
+                        continue;
+                    }
+                    argument_name = argument_name.toLowerCase();
+                    String data_type = rs.getString(3);
+                    if ("PL/SQL TABLE".equals(data_type)) { // argument is ARRAY variable
 
-        ResultSet rs = cs.executeQuery();
-        String old_overload = "something";
-        while (rs.next()) {
-            String argument_name = rs.getString(1);
-            String overload = rs.getString(2);
-            if (overload == null) { // There is no overloading
-                overload = "1";
-            }
-            if (!old_overload.equals(overload)) {
-                plp.addProcedure(overload);
-                old_overload = overload;
-            }
-            // if procedure has no argument, empty row is returned
-            if (argument_name == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("            overload: " + overload + " no argument");
+                        String category = rs.getString(3).toUpperCase();
+                        String type_owner = rs.getString(4);
+                        String type_name = rs.getString(5);
+                        String type_subname = rs.getString(6);
+                        plp.add(overload, argument_name, type_owner + "." + type_name + "." + type_subname, category);
+                        if (log.isDebugEnabled()) {
+                            log.debug("            overload: " + overload + " arg: " + argument_name + " data_type: " + data_type + " type_name: " + type_owner + "." + type_name + "." + type_subname);
+                        }
+                        rs.next();
+                    } else { // argument is SCALAR variable
+                        plp.add(overload, argument_name, data_type, "SCALAR");
+                        if (log.isDebugEnabled()) {
+                            log.debug("            overload: " + overload + " arg: " + argument_name + " data_type: " + data_type + " category: SCALAR");
+                        }
+                    }
                 }
-                continue;
-            }
-            argument_name = argument_name.toLowerCase();
-            String data_type = rs.getString(3);
-            if ("PL/SQL TABLE".equals(data_type)) { // argument is ARRAY variable
-
-                String category = rs.getString(3).toUpperCase();
-                String type_owner = rs.getString(4);
-                String type_name = rs.getString(5);
-                String type_subname = rs.getString(6);
-                plp.add(overload, argument_name, type_owner + "." + type_name + "." + type_subname, category);
-                if (log.isDebugEnabled()) {
-                    log.debug("            overload: " + overload + " arg: " + argument_name + " data_type: " + data_type + " type_name: " + type_owner + "." + type_name + "." + type_subname);
-                }
-                rs.next();
-            } else { // argument is SCALAR variable
-                plp.add(overload, argument_name, data_type, "SCALAR");
-                if (log.isDebugEnabled()) {
-                    log.debug("            overload: " + overload + " arg: " + argument_name + " data_type: " + data_type + " category: SCALAR");
+                if (exists) {
+                    return plp;
+                } else {
+                    throw new ProcedureNotFoundException("could not find procedure: " + procname);
                 }
             }
         }
-        rs.close(); //don't wait for garbage collector
-        cs.close(); //don't wait for garbage collector
-        return plp;
+
     }
 
     /**

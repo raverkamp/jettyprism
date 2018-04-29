@@ -21,5 +21,7 @@ procedure query_tables(pat varchar2);
 
 procedure tables_demo;
 
+procedure error;
+
 end;
 /
