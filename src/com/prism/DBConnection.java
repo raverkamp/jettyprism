@@ -73,7 +73,7 @@ public class DBConnection {
     public OracleConnection sqlconn;
     public ConnInfo connInfo;
 
-    protected static boolean flexibleCompact = false;
+    private boolean flexibleCompact = false;
 
     protected java.lang.String toolkitVersion;
 
@@ -479,8 +479,7 @@ public class DBConnection {
                 this.nlsTerritory
                         = langSetting.substring(langSetting.indexOf("_") + 1);
             } catch (IndexOutOfBoundsException e) {
-                log
-                        .warn("Incorrect syntax on nls_lang parameter: " + nlsSetting);
+                log.warn("Incorrect syntax on nls_lang parameter: " + nlsSetting);
             }
         }
     }
