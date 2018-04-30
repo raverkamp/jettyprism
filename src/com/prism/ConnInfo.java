@@ -98,7 +98,7 @@ public class ConnInfo {
      * @param aliasdef String
      * @throws Exception
      */
-    public ConnInfo(String aliasdef) throws Exception {
+    public ConnInfo(String aliasdef) {
 	//JHK who are we initializing
 	if ( log.isDebugEnabled() ) {
             log.debug("Initializing connection: " + aliasdef );
@@ -173,69 +173,4 @@ public class ConnInfo {
      * @return DBFactory
      */
     public DBFactory getFactory() { return factory; }
-
-    public static String getURI(HttpServletRequest req) throws SQLException {
-        String alias = "";
-        int pos;
-        if (log.isDebugEnabled())
-          log.debug(".getURI finding alias in Servlet Path='"+req.getServletPath()+"' Path Info='"+req.getPathInfo()+"'");
-        try {
-            if (DBPrism.BEHAVIOR == 0) {
-                // This behavior will work perfectly with Apache Jserv/mod_jk/Tomcat
-                // configured as standalone servlet
-                // extracts the DAD from the last part of the servlet path
-                alias = req.getServletPath();
-                if ((pos = alias.lastIndexOf('/')) >= 0)
-                    alias = alias.substring(pos + 1);
-            } else if (DBPrism.BEHAVIOR == 1) {
-                // extracts the DAD from the first part of the servlet path
-                alias = req.getServletPath();
-                if (alias.startsWith("/"))
-                    alias = alias.substring(1);
-                if ((pos = alias.indexOf('/')) > 0)
-                    alias = alias.substring(0, pos);
-            } else {
-                alias = req.getPathInfo();
-                alias = alias.substring(1, alias.lastIndexOf('/'));
-            }
-        } catch (Exception e) {
-            throw new SQLException("Can't extract DAD Information for '" + alias + "' behavior=" + DBPrism.BEHAVIOR);
-        }
-        if (log.isDebugEnabled())
-          log.debug(".getURI returning alias '"+alias+"' behaviour set to '"+DBPrism.BEHAVIOR+"'");
-        return alias;
-    }
-
-    /**
-     * Same as ConnInfo(aliasdef) but the information is retrieved from HttpServeleRequest
-     * @param req HttpServletRequest
-     * @throws SQLException
-     */
-    public ConnInfo(HttpServletRequest req) throws SQLException {
-        String alias = getURI(req);
-        connAlias = alias;
-        ConnInfo cc_tmp = DBConnection.getConnInfo(connAlias);
-        //System.out.println("copy ConnInfo with alias = "+connAlias);
-        usr = cc_tmp.usr;
-        pass = cc_tmp.pass;
-        errorPage = cc_tmp.errorPage;
-        errorLevel = cc_tmp.errorLevel;
-        dynamicLoginRealm = cc_tmp.dynamicLoginRealm;
-        documentTable = cc_tmp.documentTable;
-        docAccessPath = cc_tmp.docAccessPath;
-        docAccessProcedure = cc_tmp.docAccessProcedure;
-        defaultPage = cc_tmp.defaultPage;
-        alwaysCallDefaultPage = cc_tmp.alwaysCallDefaultPage;
-        customAuthentication = cc_tmp.customAuthentication;
-        factory = cc_tmp.factory;
-        status = cc_tmp.status;
-        connectString = cc_tmp.connectString;
-        type_owner = cc_tmp.type_owner;
-        type_name = cc_tmp.type_name;
-        type_subname = cc_tmp.type_subname;
-        flexible_escape_char = cc_tmp.flexible_escape_char;
-        xform_escape_char = cc_tmp.xform_escape_char;
-        xform_param_name = cc_tmp.xform_param_name;
-        proxyUser = cc_tmp.proxyUser;
-    }
 }

@@ -1012,7 +1012,7 @@ public class DBConnection {
      * @throws SQLException
      */
     public static synchronized ConnInfo getConnInfox(HttpServletRequest req) throws SQLException {
-        return getConnInfo(ConnInfo.getURI(req));
+        return null;// getConnInfo(ConnInfo.getURI(req));
     }
 
     /**
@@ -1043,7 +1043,7 @@ public class DBConnection {
      *
      * @throws Exception
      */
-    public static void release() throws Exception {
+    public static void release()  {
         if (dicc != null) {
             properties = null;
             dicc.clear();

@@ -87,16 +87,7 @@ public class DBPrismConnectionCacheProxy {
         
         ConnInfo.init(props);
         DBConnection.init(props);
-        // Load and register DBPrismConnectionCache implementation class.
-        String managerClass = props.getProperty("class",null,"Manager");
-        if (managerClass == null) {
-            log.warn("Warning: 'class' property is not set in category 'Manager'");
-            log.warn("----> Using com.prism.utils.JdbcDBPrismConnectionCacheImpl");
-            managerClass = "com.prism.utils.JdbcDBPrismConnectionCacheImpl";
-        }
-        if (log.isDebugEnabled())
-          log.debug("DBPrismConnectionCacheProxy: using "+managerClass+" class");
-        manager = (DBPrismConnectionCache)Class.forName(managerClass).newInstance();
+        manager = new com.prism.DBPrismConnectionCache();
         manager.init(props);
         if (log.isDebugEnabled())
           log.debug(".init exited.");
@@ -110,15 +101,15 @@ public class DBPrismConnectionCacheProxy {
      * @return DBConnection
      * @throws SQLException
      */
-    public DBConnection get(HttpServletRequest req, String usr, String pass) throws SQLException {
-        return manager.get(req, usr, pass);
+    public DBConnection get(String alias, String usr, String pass) throws SQLException {
+        return manager.get(alias, usr, pass);
     }
 
     /**
      * Shutdown DBPrismConnectionCacheProxy
      * @throws Exception
      */
-    public void release() throws Exception {
+    public void release() throws SQLException {
         if (manager != null) {
           manager.release();
           DBConnection.release();
@@ -139,6 +130,6 @@ public class DBPrismConnectionCacheProxy {
      * @throws NullPointerException
      */
     public void release(HttpServletRequest req, DBConnection connection) throws SQLException, NullPointerException {
-        manager.release(req, connection);
+        manager.release(connection);
     }
 }

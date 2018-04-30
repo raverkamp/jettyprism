@@ -32,26 +32,26 @@ public class ConnectionWrapper {
      * @return DBConnection
      * @throws SQLException
      */
-    public DBConnection getConnection(HttpServletRequest req, String usr, String pass) throws SQLException {
-        return DBPrism.cache.get(req, usr, pass);
+    public DBConnection getConnection(String alias, String usr, String pass) throws SQLException {
+        return DBPrism.cache.get(alias, usr, pass);
     }
 
-    /** Get one connection, create it, if there isn't take username and password from ConnInfo object (DAD) * @param req
-     * @param req HttpServletRequest
-     * @return DBConnection
-     * @throws SQLException
-     */
-    public DBConnection getConnection(HttpServletRequest req) throws SQLException {
-        ConnInfo cc_tmp = new ConnInfo(req);
-        return getConnection(req, cc_tmp.usr, cc_tmp.pass);
-    }
+//    /** Get one connection, create it, if there isn't take username and password from ConnInfo object (DAD) * @param req
+//     * @param req HttpServletRequest
+//     * @return DBConnection
+//     * @throws SQLException
+//     */
+//    public DBConnection getConnection(HttpServletRequest req) throws SQLException {
+//        ConnInfo cc_tmp = null ; //new ConnInfo(req);
+//        return getConnection(req, cc_tmp.usr, cc_tmp.pass);
+//    }
 
     /** Release one Connection * @param req
      * @param req HttpServletRequest
      * @param conn DBConnection
      * @throws SQLException
      */
-    public void freeConnection(HttpServletRequest req, DBConnection conn) throws SQLException {
-        DBPrism.cache.release(req, conn);
+    public void freeConnection(DBConnection conn) throws SQLException {
+        DBPrism.cache.release();
     }
 }

@@ -88,8 +88,9 @@ public class ServletWrapper extends HttpServlet {
         int errorLevel = 0;
         String errorPage = "/error.html";
         DBPrism glassPrism = null;
+        String alias = getAliasFromURI(req);
         try {
-            ConnInfo cc_tmp = new ConnInfo(req);
+            ConnInfo cc_tmp = new ConnInfo(alias);
             errorLevel = cc_tmp.errorLevel;
             errorPage = cc_tmp.errorPage;
             String pathInfo = req.getPathInfo();
@@ -276,7 +277,7 @@ public class ServletWrapper extends HttpServlet {
     }
 
     /** Returns the generated page (Reader) to the browser check for the header to set the response object */
-    public void showPage(HttpServletRequest req, HttpServletResponse res,
+    private void showPage(HttpServletRequest req, HttpServletResponse res,
                          Content page) throws Exception {
         if (log.isDebugEnabled())
             log.debug(".showPage entered.");
@@ -303,7 +304,7 @@ public class ServletWrapper extends HttpServlet {
                     if (!s.startsWith("/") && !s.startsWith("http://"))
                         // Convert relative path to absolute, fix warkaround with HTMLDB
                         s =
-                            req.getContextPath() + "/" + ConnInfo.getURI(req) + "/" +
+                            req.getContextPath() + "/" + getAliasFromURI(req)  + "/" +
                             s;
                     // LXG: changed to static access
                     res.sendRedirect(s);
@@ -412,4 +413,38 @@ public class ServletWrapper extends HttpServlet {
         if (log.isDebugEnabled())
             log.debug(".showPage exited.");
     }
+    
+     private static String getAliasFromURI(HttpServletRequest req) {
+        String alias = "";
+        int pos;
+        if (log.isDebugEnabled())
+          log.debug(".getURI finding alias in Servlet Path='"+req.getServletPath()+"' Path Info='"+req.getPathInfo()+"'");
+        try {
+            if (DBPrism.BEHAVIOR == 0) {
+                // This behavior will work perfectly with Apache Jserv/mod_jk/Tomcat
+                // configured as standalone servlet
+                // extracts the DAD from the last part of the servlet path
+                alias = req.getServletPath();
+                if ((pos = alias.lastIndexOf('/')) >= 0)
+                    alias = alias.substring(pos + 1);
+            } else if (DBPrism.BEHAVIOR == 1) {
+                // extracts the DAD from the first part of the servlet path
+                alias = req.getServletPath();
+                if (alias.startsWith("/"))
+                    alias = alias.substring(1);
+                if ((pos = alias.indexOf('/')) > 0)
+                    alias = alias.substring(0, pos);
+            } else {
+                alias = req.getPathInfo();
+                alias = alias.substring(1, alias.lastIndexOf('/'));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Can't extract DAD Information for '" + alias + "' behavior=" + DBPrism.BEHAVIOR);
+        }
+        if (log.isDebugEnabled())
+          log.debug(".getURI returning alias '"+alias+"' behaviour set to '"+DBPrism.BEHAVIOR+"'");
+        return alias;
+    }
+
+  
 }

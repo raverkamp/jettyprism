@@ -112,7 +112,7 @@ public class DBPrism {
             boolean dLogin = "".equals(cc_tmp.usr);
             if (!dLogin) {
                 // if DAD username is not null, log to database using DAD username and password 
-                connection = cache.get(req, cc_tmp.usr, cc_tmp.pass);
+                connection = cache.get(cc_tmp.connAlias, cc_tmp.usr, cc_tmp.pass);
                 if (log.isDebugEnabled()) {
                     log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                 }        // Copy DAD username and password from DAD info
@@ -127,7 +127,7 @@ public class DBPrism {
                 throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
             } else {
                 try { // DAD username is null, try to connect using B64 user/pass values
-                    connection = cache.get(req, name, password);
+                    connection = cache.get(cc_tmp.connAlias, name, password);
                     if (log.isDebugEnabled()) {
                         log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                     }
@@ -204,7 +204,7 @@ public class DBPrism {
             boolean dLogin = "".equals(cc_tmp.usr);
             if (!dLogin) {
                 // if DAD username is not null, log to database using DAD username and password 
-                connection = cache.get(req, cc_tmp.usr, cc_tmp.pass);
+                connection = cache.get(cc_tmp.connAlias, cc_tmp.usr, cc_tmp.pass);
                 if (log.isDebugEnabled()) {
                     log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                 }        // Copy DAD username and password from DAD info
@@ -219,7 +219,7 @@ public class DBPrism {
                 throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
             } else {
                 try { // DAD username is null, try to connect using B64 user/pass values
-                    connection = cache.get(req, name, password);
+                    connection = cache.get(cc_tmp.connAlias, name, password);
                 } catch (SQLException e) {
                     throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
                 }
