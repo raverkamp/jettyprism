@@ -11,9 +11,12 @@ package com.prism;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
+import oracle.jdbc.OracleConnection;
+import oracle.jdbc.pool.OracleDataSource;
 import org.apache.log4j.Logger;
 import spinat.jettyprism.Configuration;
 //import org.jconfig.ConfigurationManager;
@@ -56,13 +59,7 @@ public class DBPrism {
     public static DBPrismConnectionCacheProxy cache = null;
     public static DBProcedure proccache = null;
     private static boolean cachep = true;
-    private static Configuration properties = null;
-
-    /**
-     * Singleton instance
-     */
-   // static DBPrism instance = null;
-    static boolean isInitialized = false;
+    private Configuration properties = null;
 
     /**
      * private connection which hold the connection betwen makePage and getPage
@@ -112,7 +109,7 @@ public class DBPrism {
             boolean dLogin = "".equals(cc_tmp.usr);
             if (!dLogin) {
                 // if DAD username is not null, log to database using DAD username and password 
-                connection = cache.get(cc_tmp.connAlias, cc_tmp.usr, cc_tmp.pass);
+                connection =  this.createDBConnection(cc_tmp, cc_tmp.usr, cc_tmp.pass);
                 if (log.isDebugEnabled()) {
                     log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                 }        // Copy DAD username and password from DAD info
@@ -127,7 +124,7 @@ public class DBPrism {
                 throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
             } else {
                 try { // DAD username is null, try to connect using B64 user/pass values
-                    connection = cache.get(cc_tmp.connAlias, name, password);
+                    connection =this.createDBConnection(cc_tmp, name, password);
                     if (log.isDebugEnabled()) {
                         log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                     }
@@ -233,19 +230,6 @@ public class DBPrism {
         }
     }
 
-    /**
-     * Returns the singleton instance
-     *
-     * @param filename
-     * @throws ExecutionErrorMsgException
-     */
-    public static synchronized void initDBPrism(String filename) throws Exception {
-        if (!isInitialized) {
-            init(filename);
-            isInitialized = true;
-        }
-    }
-
 
     /**
      * A public constructor to manage multiple connections
@@ -277,7 +261,7 @@ public class DBPrism {
      * @param filename
      * @throws IOException
      */
-    static void init(String filename) throws IOException {
+    public void init(String filename) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(".init entered.");
         }
@@ -320,7 +304,7 @@ public class DBPrism {
      *
      * @throws Exception
      */
-    static void release() throws Exception {
+    public void release() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug(".release entered.");
         }
@@ -331,5 +315,19 @@ public class DBPrism {
         if (log.isDebugEnabled()) {
             log.debug(".release DBPrism shutdown complete.");
         }
+    }
+    
+     private HashMap<String, OracleDataSource> dss = new HashMap<>();
+
+    DBConnection createDBConnection(ConnInfo ci, String user, String pw) throws SQLException {
+        if (dss.containsKey(ci.connAlias)) {
+            OracleConnection con = (OracleConnection) dss.get(ci.connAlias).getConnection(user, pw);
+            con.setAutoCommit(false);
+            return new DBConnection(this.properties, ci, con);
+        }
+        OracleDataSource ds = new OracleDataSource();
+        ds.setURL(ci.connectString);
+        dss.put(ci.connAlias,ds);
+        return this.createDBConnection(ci, user, pw);
     }
 }

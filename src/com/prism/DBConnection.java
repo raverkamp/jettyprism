@@ -72,10 +72,9 @@ public class DBConnection {
     //static public final int GLOBAL = 2; /* global check by a single procedure */
     //static public final int PER_PACKAGE = 3; /* use auth procedure in each package */
     //static public final int CUSTOM = 4;
-    public Connection sqlconn;
+    public OracleConnection sqlconn;
     public ConnInfo connInfo;
-    private static Hashtable dicc = null;
-    protected static Configuration properties = null;
+  
     protected static boolean flexibleCompact = false;
 
     protected java.lang.String toolkitVersion;
@@ -87,6 +86,7 @@ public class DBConnection {
     protected java.lang.String excludeList;
 
     static final int MAX_PL_LINES = 127;
+    
 
     /**
      * Template method calls<BR>
@@ -456,11 +456,12 @@ public class DBConnection {
      * Create a concrete DBConnection (DBConnPLSQL). Find extra properties
      * attributes of this connection and return a concrete connection object.
      */
-    public DBConnection(ConnInfo cc) {
+    public DBConnection(Configuration properties,ConnInfo cc,  OracleConnection sqlcon) {
         DBConnection con = this;
+        con.sqlconn = sqlcon;
         con.connInfo = cc;
-        con.toolkitVersion
-                = properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
+        con.toolkitVersion = 
+                 properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
         con.excludeList
                 = properties.getProperty("exclusion_list", "sys. owa dbms_ htp.",
                         "DAD_" + cc.connAlias);
@@ -975,45 +976,6 @@ public class DBConnection {
         return text_error.toString();
     }
 
-    /**
-     * This class has a dictionary for all connection defs readed from
-     * properties file. This method return the Enumeration object to search in
-     * all connections
-     *
-     * @return Enumeration
-     */
-    public static Enumeration getAll() {
-        return dicc.elements();
-    }
-
-    /**
-     * Returns a ConnInfo object corresponding to a defintion string Ej:
-     * http://server:port/servlet/demo/pkg.sp?arg1=val1&arg2=val2
-     *
-     * @param conndef String
-     * @return ConnInfo object "demo"
-     * @throws SQLException
-     */
-    public static synchronized ConnInfo getConnInfo(String conndef) throws SQLException {
-        ConnInfo cc_tmp = (ConnInfo) dicc.get(conndef);
-        if (cc_tmp == null) {
-            throw new SQLException("Can't find connection Information for '" + conndef + "'");
-        }
-        return cc_tmp;
-    }
-
-    /**
-     * Returns a ConnInfo object corresponding to a particular
-     * HttpServletRequest Ej:
-     * http://server:port/servlet/demo/pkg.sp?arg1=val1&arg2=val2
-     *
-     * @param req HttpServletRequest
-     * @return ConnInfo object "demo"
-     * @throws SQLException
-     */
-    public static synchronized ConnInfo getConnInfox(HttpServletRequest req) throws SQLException {
-        return null;// getConnInfo(ConnInfo.getURI(req));
-    }
 
     /**
      * Init method Find the definition of alias (global.alias) to get connection
@@ -1022,11 +984,12 @@ public class DBConnection {
      * @param props Configuration
      * @throws Exception
      */
-    public static void init(Configuration props) throws Exception {
+    /*public static void init(Configuration props) throws Exception {
         String flexibleRequest, connAlias;
         flexibleRequest = props.getProperty("flexibleRequest", "old");
         flexibleCompact = flexibleRequest.equalsIgnoreCase("compact");
         connAlias = props.getProperty("alias", "");
+        this. = ConnInfo(aliasdef);
         if (dicc == null) {
             dicc = new Hashtable();
             properties = props;
@@ -1036,20 +999,21 @@ public class DBConnection {
                 dicc.put(aliasdef, new ConnInfo(aliasdef));
             }
         }
-    }
+    }*/
 
     /**
      * Release method free all resources
      *
      * @throws Exception
      */
-    public static void release()  {
+    /*public static void release()  {
         if (dicc != null) {
             properties = null;
             dicc.clear();
             dicc = null;
         }
     }
+    */
 
     /**
      * return response form DB this is done by:

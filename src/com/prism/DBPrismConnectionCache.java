@@ -224,7 +224,7 @@ public class DBPrismConnectionCache implements java.lang.Runnable {
             throw new SQLException("No more connections available");
         }
         DBFactory factory = cc_tmp.getFactory();
-        connection = factory.createDBConnection(cc_tmp); // Allocated
+        //connection = factory.createDBConnection(cc_tmp); // Allocated
         // DBConnection
         TxId = connection.toString(); // Store connection id as TxId
         counter = connectionTimeOut; // How much wait for unused connection
@@ -235,7 +235,7 @@ public class DBPrismConnectionCache implements java.lang.Runnable {
             log.debug("user: " + usr);
             //log.debug("pass: " + pass );
         }
-        connection.sqlconn = DriverManager.getConnection(cc_tmp.connectString, usr, pass);
+       // connection.sqlconn = DriverManager.getConnection(cc_tmp.connectString, usr, pass);
         connection.sqlconn.setAutoCommit(false);
         if (log.isDebugEnabled()) {
             log.debug("Connect without auto commit " + TxId);

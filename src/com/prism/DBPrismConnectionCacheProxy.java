@@ -86,7 +86,7 @@ public class DBPrismConnectionCacheProxy {
           log.debug(".init entered.");
         
         ConnInfo.init(props);
-        DBConnection.init(props);
+       // DBConnection.init(props);
         manager = new com.prism.DBPrismConnectionCache();
         manager.init(props);
         if (log.isDebugEnabled())
@@ -112,7 +112,7 @@ public class DBPrismConnectionCacheProxy {
     public void release() throws SQLException {
         if (manager != null) {
           manager.release();
-          DBConnection.release();
+          //DBConnection.release();
           ConnInfo.release();
          
           manager = null;
