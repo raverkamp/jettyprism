@@ -8,7 +8,6 @@
  */
 package com.prism;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -20,10 +19,6 @@ import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 import org.apache.log4j.Logger;
 import spinat.jettyprism.Configuration;
-//import org.jconfig.ConfigurationManager;
-//import org.jconfig.handler.InputStreamHandler;
-//import org.jconfig.handler.URLHandler;
-//import org.jconfig.handler.XMLFileHandler;
 
 /**
  * This class is a Singleton that provides access to one or many connection DB
@@ -48,14 +43,11 @@ import spinat.jettyprism.Configuration;
  */
 public class DBPrism {
 
-    private static Logger log = Logger.getLogger(DBPrism.class);
-    public static java.lang.String NAME = "DBPrism";
-    public static java.lang.String VERSION = "2.1.2.2-production";
-    private static java.lang.String CONFIGURATION = "prism.xconf";  // JHK this string should only appear once in this file.
-    public static java.lang.String PROPERTIES = "/" + CONFIGURATION;
-    public static java.lang.String CONTENTTYPE = "text/html";
-    public static java.lang.String UnauthorizedText;
-    public static int maxUploadSize = 8192 * 1024;
+    final private static Logger log = Logger.getLogger(DBPrism.class);
+    final public static java.lang.String NAME = "DBPrism";
+    final public static java.lang.String VERSION = "2018-04-20-production";
+    final private static java.lang.String CONFIGURATION = "prism.xconf";  // JHK this string should only appear once in this file.
+    final public static java.lang.String PROPERTIES = "/" + CONFIGURATION;
     private DBProcedure proccache = null;
     private boolean cachep = true;
     private Configuration properties = null;
@@ -262,13 +254,6 @@ public class DBPrism {
             log.debug(".init entered.");
         }
         this.properties = properties;
-
-        // Set global DB Prism variables
-        //LANG = properties.getProperty("lang");
-        //COUNTRY = properties.getProperty("country");
-        CONTENTTYPE = properties.getProperty("contenttype", "text/html");
-        UnauthorizedText = properties.getProperty("UnauthorizedText", "You must be enter DB username and password to access at the system");
-        maxUploadSize = properties.getIntProperty("maxUploadSize", 8388608);
         cachep = properties.getBooleanProperty("cacheprocedure", true);
         proccache = new DBProcedure(cachep);
 

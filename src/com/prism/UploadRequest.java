@@ -45,8 +45,7 @@ import oracle.sql.BLOB;
  * <LI>JavDoc cleanup</LI>
  * <LI>code cleanup</LI></UL>
  */
-public class UploadRequest extends HttpServletRequestWrapper {
-//    private static final java.lang.String UNKNOWN = "unknown";
+public final class UploadRequest extends HttpServletRequestWrapper {
 
     protected HttpServletRequest req;
     protected DBConnection conn; // Connection information to access to the repository
@@ -57,22 +56,16 @@ public class UploadRequest extends HttpServletRequestWrapper {
      * parameters names too. Multiples upload are represented in the vector as
      * name={upload1,upload2,...}
      */
-    private RequestParameters upreq = new RequestParameters();
-    public UploadContent upload = new UploadContent();
-    public Random rand = new Random();
-
-    /**
-     * Create a concrete SPProc (Upload8i).
-     */
-    public UploadRequest create(HttpServletRequest request, DBConnection repositoryConnection)
-            throws IOException, SQLException {
-        return new UploadRequest(request, repositoryConnection);
-    }
+    final RequestParameters upreq = new RequestParameters();
+    final UploadContent upload = new UploadContent();
+    final Random rand = new Random();
+    final int maxUploadSize;
 
     // LXG: removed SQLException as it is not thrown
     // public UploadRequest(HttpServletRequest request, DBConnection repositoryConnection) throws IOException, SQLException {
-    public UploadRequest(HttpServletRequest request, DBConnection repositoryConnection) throws IOException {
+    public UploadRequest(HttpServletRequest request, DBConnection repositoryConnection, int maxUploadSize) throws IOException {
         super(request);
+        this.maxUploadSize = maxUploadSize;
         // Sanity check values
         if (request == null) {
             throw new IllegalArgumentException("request cannot be null");
@@ -484,9 +477,9 @@ public class UploadRequest extends HttpServletRequestWrapper {
     protected void readRequest() throws IOException {
         // Check the content length to prevent denial of service attacks
         int length = req.getContentLength();
-        if (length > DBPrism.maxUploadSize) {
+        if (length > this.maxUploadSize) {
             throw new IOException("Posted content is greater than global.maxUploadSize parameter ("
-                    + DBPrism.maxUploadSize / 1024 + " KB)");
+                    + this.maxUploadSize / 1024 + " KB)");
         }
         // Check the content type to make sure it's "multipart/form-data"
         // Access header two ways to work around WebSphere oddities

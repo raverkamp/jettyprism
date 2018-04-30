@@ -58,6 +58,8 @@ public class ServletWrapper extends HttpServlet {
     private DBPrism dbprism = null;
     private Configuration properties;
     private int behavior;
+    private java.lang.String defaultContentType = "text/html";
+    private java.lang.String UnauthorizedText;
 
     public ServletWrapper() {
         // LXG: call to super is generated anyway but put it here for clarity.
@@ -84,7 +86,10 @@ public class ServletWrapper extends HttpServlet {
             this.properties = Configuration.loadFromPropertiesFile(propfilename);
             this.dbprism.init(properties);
             this.behavior = properties.getIntProperty("behavior", 0);
-        } catch (Exception e) {
+            this.defaultContentType = properties.getProperty("contenttype", "text/html");
+            this.UnauthorizedText = properties.getProperty("UnauthorizedText",
+                    "You must be enter DB username and password to access at the system");
+        } catch (IOException e) {
             log.error("Error Loading " + sc.getInitParameter("properties"), e);
             throw new ServletException(e);
         }
@@ -165,7 +170,7 @@ public class ServletWrapper extends HttpServlet {
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         // put your realm here
         res.setHeader("WWW-authenticate", "basic realm=\"" + msg + "\"");
-        out.print(DBPrism.UnauthorizedText);
+        out.print(this.UnauthorizedText);
         out.flush();
         if (log.isDebugEnabled()) {
             log.debug(".sendUnauthorized basic realm='" + msg + "'");
@@ -194,7 +199,7 @@ public class ServletWrapper extends HttpServlet {
         if (log.isDebugEnabled()) {
             log.debug(".sendFailureMsg generated error page " + reason);
         }
-        res.setContentType(DBPrism.CONTENTTYPE);
+        res.setContentType(this.defaultContentType);
         out.println("<html><head></head><body BGCOLOR=\"#ffffff\">");
         out.println("<h3>Servlet Wrapper Error Page</h3><pre>");
         out.println(reason);
@@ -380,7 +385,7 @@ public class ServletWrapper extends HttpServlet {
             } while ((s = in.readLine()) != null && s.length() > 0);
             // End while header lines
             if (!contentType) {
-                res.setContentType(DBPrism.CONTENTTYPE);
+                res.setContentType(this.defaultContentType);
             }
             // this is new in DBPrism 2.1.1 (support for HTMLDB 2.0 inline download functionality
             InputStream is = page.getInputStream();
@@ -417,7 +422,7 @@ public class ServletWrapper extends HttpServlet {
         } else {
             // if not header syntax, print it as is
             // Set default Content-type
-            res.setContentType(DBPrism.CONTENTTYPE);
+            res.setContentType(this.defaultContentType);
             // Get the writer
             PrintWriter out = null;
             out = res.getWriter();

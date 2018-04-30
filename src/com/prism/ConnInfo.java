@@ -36,7 +36,7 @@ import spinat.jettyprism.Configuration;
  */
 public class ConnInfo {
 
-    private static Logger log = Logger.getLogger(ConnInfo.class);
+    final private static Logger log = Logger.getLogger(ConnInfo.class);
 
     public static final int CONN_FREE = 1;
     public static final int CONN_TX = 2;
@@ -55,7 +55,6 @@ public class ConnInfo {
     public boolean alwaysCallDefaultPage;
     public java.lang.String customAuthentication;
     public boolean proxyUser;
-    public DBFactory factory;
     public java.lang.String clientCharset = "iso-8859-1";
     //public java.lang.String dbCharset = "iso-8859-1";
 
@@ -139,8 +138,6 @@ public class ConnInfo {
             log.debug("useProxyUser:          " + proxyUser);
         }
 
-        factory = new com.prism.DBFactory();
-
         clientCharset
                 = properties.getProperty("clientcharset", "iso-8859-1", "DAD_" + aliasdef);
         type_owner
@@ -150,14 +147,5 @@ public class ConnInfo {
         type_subname
                 = properties.getProperty("type_subname", "IDENT_ARR", "DAD_" + aliasdef);
         status = CONN_FREE;
-    }
-
-    /**
-     * This method returns a concrete factory for a concrete DataBase
-     *
-     * @return DBFactory
-     */
-    public DBFactory getFactory() {
-        return factory;
     }
 }

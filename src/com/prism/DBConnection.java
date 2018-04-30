@@ -86,6 +86,7 @@ public class DBConnection {
     protected java.lang.String excludeList;
 
     private final int behavior;
+    private final int maxUploadSize;
 
     static final int MAX_PL_LINES = 127;
 
@@ -163,7 +164,8 @@ public class DBConnection {
         }
         if (type != null && type.toLowerCase().startsWith("multipart/form-data")) {
             // Handle multipart post, sent it as binary stream in a BLOB argument
-            UploadRequest multi = connInfo.factory.createUploadRequest(req, this);
+            UploadRequest multi = new UploadRequest(req, this, this.maxUploadSize);
+
             // Calls the stored procedures with the new request
             doIt(proccache, multi, getSPCommand(multi));
         } else if (command.startsWith(connInfo.flexible_escape_char)) // Calls the stored procedures with the wrapper request
@@ -467,6 +469,7 @@ public class DBConnection {
                 = properties.getProperty("exclusion_list", "sys. owa dbms_ htp.",
                         "DAD_" + cc.connAlias);
         this.behavior = properties.getIntProperty("behavior", 0);
+        this.maxUploadSize = properties.getIntProperty("maxUploadSize", 8388608);
         String nlsSetting
                 = properties.getProperty("nls_lang", null, "DAD_" + cc.connAlias);
         if (nlsSetting != null) {
@@ -719,15 +722,12 @@ public class DBConnection {
         if (log.isDebugEnabled()) {
             log.debug("buff=" + s);
         }
-        try {
-            download
-                    = this.connInfo.getFactory().createDownloadRequest(req, this);
-            if (download != null && download.isFileDownload()) {
-                generatedContent.setInputStream(download.getStream(download.getDownloadInfo()));
-            }
-        } catch (IOException e) {
-            log.warn(".getGeneratedStream -  error getting the InputStrem in a inline download", e);
+
+        download = new DownloadRequest(req, this);
+        if (download != null && download.isFileDownload()) {
+            generatedContent.setInputStream(download.getStream(download.getDownloadInfo()));
         }
+
         return generatedContent;
     }
 
@@ -815,7 +815,7 @@ public class DBConnection {
             String realms = getRealm();
             throw new NotAuthorizedException(realms);
         }
-        DownloadRequest downloadRequest = connInfo.factory.createDownloadRequest(req, this);
+        DownloadRequest downloadRequest = new DownloadRequest(req, this);
         downloadRequest.doDownloadFromDB(res);
     }
 
