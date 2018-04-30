@@ -56,8 +56,7 @@ public class DBPrism {
     public static java.lang.String CONTENTTYPE = "text/html";
     public static java.lang.String UnauthorizedText;
     public static int maxUploadSize = 8192 * 1024;
-    public static int BEHAVIOR = 0;
-    public DBProcedure proccache = null;
+    private DBProcedure proccache = null;
     private boolean cachep = true;
     private Configuration properties = null;
 
@@ -269,7 +268,6 @@ public class DBPrism {
         //COUNTRY = properties.getProperty("country");
         CONTENTTYPE = properties.getProperty("contenttype", "text/html");
         UnauthorizedText = properties.getProperty("UnauthorizedText", "You must be enter DB username and password to access at the system");
-        BEHAVIOR = properties.getIntProperty("behavior", 0);
         maxUploadSize = properties.getIntProperty("maxUploadSize", 8388608);
         cachep = properties.getBooleanProperty("cacheprocedure", true);
         proccache = new DBProcedure(cachep);

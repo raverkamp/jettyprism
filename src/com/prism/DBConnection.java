@@ -85,6 +85,8 @@ public class DBConnection {
 
     protected java.lang.String excludeList;
 
+    private final int behavior;
+
     static final int MAX_PL_LINES = 127;
 
     /**
@@ -456,23 +458,24 @@ public class DBConnection {
      * attributes of this connection and return a concrete connection object.
      */
     public DBConnection(Configuration properties, ConnInfo cc, OracleConnection sqlcon) {
-        DBConnection con = this;
-        con.sqlconn = sqlcon;
-        con.connInfo = cc;
-        con.toolkitVersion
+
+        this.sqlconn = sqlcon;
+        this.connInfo = cc;
+        this.toolkitVersion
                 = properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
-        con.excludeList
+        this.excludeList
                 = properties.getProperty("exclusion_list", "sys. owa dbms_ htp.",
                         "DAD_" + cc.connAlias);
+        this.behavior = properties.getIntProperty("behavior", 0);
         String nlsSetting
                 = properties.getProperty("nls_lang", null, "DAD_" + cc.connAlias);
         if (nlsSetting != null) {
             try {
                 String langSetting
                         = nlsSetting.substring(0, nlsSetting.indexOf("."));
-                con.nlsLanguage
+                this.nlsLanguage
                         = langSetting.substring(0, langSetting.indexOf("_"));
-                con.nlsTerritory
+                this.nlsTerritory
                         = langSetting.substring(langSetting.indexOf("_") + 1);
             } catch (IndexOutOfBoundsException e) {
                 log
@@ -883,7 +886,7 @@ public class DBConnection {
             return connInfo.defaultPage;
         }
         try {
-            if (DBPrism.BEHAVIOR == 0 || DBPrism.BEHAVIOR == 2) {
+            if (this.behavior == 0 || this.behavior == 2) {
                 servletpath = replace2(req.getPathInfo());
             } else {
                 servletpath = replace2(req.getServletPath());

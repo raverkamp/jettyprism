@@ -57,6 +57,7 @@ public class ServletWrapper extends HttpServlet {
     private static Logger log = Logger.getLogger(ServletWrapper.class);
     private DBPrism dbprism = null;
     private Configuration properties;
+    private int behavior;
 
     public ServletWrapper() {
         // LXG: call to super is generated anyway but put it here for clarity.
@@ -82,6 +83,7 @@ public class ServletWrapper extends HttpServlet {
             this.dbprism = new DBPrism();
             this.properties = Configuration.loadFromPropertiesFile(propfilename);
             this.dbprism.init(properties);
+            this.behavior = properties.getIntProperty("behavior", 0);
         } catch (Exception e) {
             log.error("Error Loading " + sc.getInitParameter("properties"), e);
             throw new ServletException(e);
@@ -437,14 +439,14 @@ public class ServletWrapper extends HttpServlet {
         }
     }
 
-    private static String getAliasFromURI(HttpServletRequest req) {
+    private String getAliasFromURI(HttpServletRequest req) {
         String alias = "";
         int pos;
         if (log.isDebugEnabled()) {
             log.debug(".getURI finding alias in Servlet Path='" + req.getServletPath() + "' Path Info='" + req.getPathInfo() + "'");
         }
         try {
-            if (DBPrism.BEHAVIOR == 0) {
+            if (this.behavior == 0) {
                 // This behavior will work perfectly with Apache Jserv/mod_jk/Tomcat
                 // configured as standalone servlet
                 // extracts the DAD from the last part of the servlet path
@@ -452,7 +454,7 @@ public class ServletWrapper extends HttpServlet {
                 if ((pos = alias.lastIndexOf('/')) >= 0) {
                     alias = alias.substring(pos + 1);
                 }
-            } else if (DBPrism.BEHAVIOR == 1) {
+            } else if (this.behavior == 1) {
                 // extracts the DAD from the first part of the servlet path
                 alias = req.getServletPath();
                 if (alias.startsWith("/")) {
@@ -466,10 +468,10 @@ public class ServletWrapper extends HttpServlet {
                 alias = alias.substring(1, alias.lastIndexOf('/'));
             }
         } catch (Exception e) {
-            throw new RuntimeException("Can't extract DAD Information for '" + alias + "' behavior=" + DBPrism.BEHAVIOR);
+            throw new RuntimeException("Can't extract DAD Information for '" + alias + "' behavior=" + this.behavior);
         }
         if (log.isDebugEnabled()) {
-            log.debug(".getURI returning alias '" + alias + "' behaviour set to '" + DBPrism.BEHAVIOR + "'");
+            log.debug(".getURI returning alias '" + alias + "' behaviour set to '" + this.behavior + "'");
         }
         return alias;
     }
