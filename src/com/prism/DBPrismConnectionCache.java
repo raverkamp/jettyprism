@@ -235,7 +235,7 @@ public class DBPrismConnectionCache implements java.lang.Runnable {
             log.debug("user: " + usr);
             //log.debug("pass: " + pass );
         }
-       // connection.sqlconn = DriverManager.getConnection(cc_tmp.connectString, usr, pass);
+        // connection.sqlconn = DriverManager.getConnection(cc_tmp.connectString, usr, pass);
         connection.sqlconn.setAutoCommit(false);
         if (log.isDebugEnabled()) {
             log.debug("Connect without auto commit " + TxId);

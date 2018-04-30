@@ -6,7 +6,6 @@
  * version 1.1, a copy of which has been included  with this distribution in     *
  * the LICENSE file.                                                             *
  */
-
 package com.prism.utils;
 
 import java.io.IOException;
@@ -19,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.prism.UploadException;
 
 public class UploadContent {
+
     protected byte[] m_binArray;
     protected HttpServletRequest m_request;
     protected HttpServletResponse m_response;
@@ -78,25 +78,29 @@ public class UploadContent {
         boolean isFile = false;
         m_totalBytes = m_request.getContentLength();
         m_binArray = new byte[m_totalBytes];
-        for ( ; totalRead < m_totalBytes; totalRead += readBytes)
+        for (; totalRead < m_totalBytes; totalRead += readBytes) {
             try {
                 m_request.getInputStream();
                 readBytes = m_request.getInputStream().read(m_binArray, totalRead, m_totalBytes - totalRead);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new UploadException("Unable to upload.");
             }
-        for ( ; !found && m_currentIndex < m_totalBytes; m_currentIndex++)
-            if (m_binArray[m_currentIndex] == 13)
+        }
+        for (; !found && m_currentIndex < m_totalBytes; m_currentIndex++) {
+            if (m_binArray[m_currentIndex] == 13) {
                 found = true;
-            else
-                m_boundary = m_boundary + (char)m_binArray[m_currentIndex];
-        if (m_currentIndex == 1)
+            } else {
+                m_boundary = m_boundary + (char) m_binArray[m_currentIndex];
+            }
+        }
+        if (m_currentIndex == 1) {
             return;
+        }
         m_currentIndex++;
         do {
-            if (m_currentIndex >= m_totalBytes)
+            if (m_currentIndex >= m_totalBytes) {
                 break;
+            }
             dataHeader = getDataHeader();
             m_currentIndex = m_currentIndex + 2;
             isFile = dataHeader.indexOf("filename") > 0;
@@ -112,16 +116,19 @@ public class UploadContent {
             }
             getDataSection();
             if (isFile && fileName.length() > 0) {
-                if (m_deniedFilesList.contains(fileExt))
+                if (m_deniedFilesList.contains(fileExt)) {
                     throw new SecurityException("The extension of the file is denied to be uploaded (1015).");
-                if (!m_allowedFilesList.isEmpty() && !m_allowedFilesList.contains(fileExt))
+                }
+                if (!m_allowedFilesList.isEmpty() && !m_allowedFilesList.contains(fileExt)) {
                     throw new SecurityException("The extension of the file is not allowed to be uploaded (1010).");
-                if (m_maxFileSize > (long)0 && (long)((m_endData - m_startData) + 1) > m_maxFileSize)
-                    throw new SecurityException(String.valueOf((
-                        new StringBuffer("Size exceeded for this file : ")).append(fileName).append(" (1105).")));
+                }
+                if (m_maxFileSize > (long) 0 && (long) ((m_endData - m_startData) + 1) > m_maxFileSize) {
+                    throw new SecurityException(String.valueOf((new StringBuffer("Size exceeded for this file : ")).append(fileName).append(" (1105).")));
+                }
                 totalFileSize += (m_endData - m_startData) + 1;
-                if (m_totalMaxFileSize > (long)0 && totalFileSize > m_totalMaxFileSize)
+                if (m_totalMaxFileSize > (long) 0 && totalFileSize > m_totalMaxFileSize) {
                     throw new SecurityException("Total File Size exceeded (1110).");
+                }
             }
             if (isFile) {
                 UploadedFile newFile = new UploadedFile();
@@ -135,8 +142,9 @@ public class UploadContent {
                 newFile.setContentDisp(contentDisp);
                 newFile.setTypeMIME(typeMIME);
                 newFile.setSubTypeMIME(subTypeMIME);
-                if (contentType.indexOf("application/x-macbinary") > 0)
+                if (contentType.indexOf("application/x-macbinary") > 0) {
                     m_startData = m_startData + 128;
+                }
                 newFile.setSize((m_endData - m_startData) + 1);
                 newFile.setStartData(m_startData);
                 newFile.setEndData(m_endData);
@@ -145,8 +153,9 @@ public class UploadContent {
                 String value = new String(m_binArray, m_startData, (m_endData - m_startData) + 1);
                 m_formRequest.putParameter(fieldName, value);
             }
-            if ((char)m_binArray[m_currentIndex + 1] == '-')
+            if ((char) m_binArray[m_currentIndex + 1] == '-') {
                 break;
+            }
             m_currentIndex = m_currentIndex + 2;
         } while (true);
     }
@@ -159,8 +168,7 @@ public class UploadContent {
         byte retval;
         try {
             retval = m_binArray[index];
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ArrayIndexOutOfBoundsException("Index out of range (1005).");
         }
         return retval;
@@ -188,8 +196,9 @@ public class UploadContent {
             start = i;
             token = "\"";
             end = dataHeader.indexOf(token, i);
-            if (start > 0 && end > 0)
+            if (start > 0 && end > 0) {
                 value = dataHeader.substring(start, end);
+            }
         }
         return value;
     }
@@ -198,15 +207,17 @@ public class UploadContent {
         String value = new String();
         int start = 0;
         int end = 0;
-        if (fileName == null)
+        if (fileName == null) {
             return null;
+        }
         start = fileName.lastIndexOf(46) + 1;
         end = fileName.length();
         value = fileName.substring(start, end);
-        if (fileName.lastIndexOf(46) > 0)
+        if (fileName.lastIndexOf(46) > 0) {
             return value;
-        else
+        } else {
             return "";
+        }
     }
 
     private String getContentType(String dataHeader) {
@@ -227,10 +238,11 @@ public class UploadContent {
         String value = new String();
         int pos = 0;
         pos = ContentType.indexOf("/");
-        if (pos != -1)
+        if (pos != -1) {
             return ContentType.substring(1, pos);
-        else
+        } else {
             return ContentType;
+        }
     }
 
     private String getSubTypeMIME(String ContentType) {
@@ -265,9 +277,10 @@ public class UploadContent {
         m_startData = m_currentIndex;
         m_endData = 0;
         do {
-            if (searchPos >= m_totalBytes)
+            if (searchPos >= m_totalBytes) {
                 break;
-            if (m_binArray[searchPos] == (byte)m_boundary.charAt(keyPos)) {
+            }
+            if (m_binArray[searchPos] == (byte) m_boundary.charAt(keyPos)) {
                 if (keyPos == boundaryLen - 1) {
                     m_endData = ((searchPos - boundaryLen) + 1) - 3;
                     break;
@@ -287,7 +300,7 @@ public class UploadContent {
         int end = 0;
         int len = 0;
         boolean found = false;
-        while (!found)
+        while (!found) {
             if (m_binArray[m_currentIndex] == 13 && m_binArray[m_currentIndex + 2] == 13) {
                 found = true;
                 end = m_currentIndex - 1;
@@ -295,6 +308,7 @@ public class UploadContent {
             } else {
                 m_currentIndex++;
             }
+        }
         String dataHeader = new String(m_binArray, start, (end - start) + 1);
         return dataHeader;
     }
@@ -307,29 +321,34 @@ public class UploadContent {
         int start = 0;
         int end = 0;
         pos = filePathName.lastIndexOf(47);
-        if (pos != -1)
+        if (pos != -1) {
             return filePathName.substring(pos + 1, filePathName.length());
+        }
         pos = filePathName.lastIndexOf(92);
-        if (pos != -1)
+        if (pos != -1) {
             return filePathName.substring(pos + 1, filePathName.length());
-        else
+        } else {
             return filePathName;
+        }
     }
 
     public void setDeniedFilesList(String deniedFilesList) throws IOException, ServletException {
         String ext = "";
         if (deniedFilesList != null) {
             ext = "";
-            for (int i = 0; i < deniedFilesList.length(); i++)
+            for (int i = 0; i < deniedFilesList.length(); i++) {
                 if (deniedFilesList.charAt(i) == ',') {
-                    if (!m_deniedFilesList.contains(ext))
+                    if (!m_deniedFilesList.contains(ext)) {
                         m_deniedFilesList.addElement(ext);
+                    }
                     ext = "";
                 } else {
                     ext = ext + deniedFilesList.charAt(i);
                 }
-            if (ext != "")
+            }
+            if (ext != "") {
                 m_deniedFilesList.addElement(ext);
+            }
         } else {
             m_deniedFilesList = null;
         }
@@ -339,16 +358,19 @@ public class UploadContent {
         String ext = "";
         if (allowedFilesList != null) {
             ext = "";
-            for (int i = 0; i < allowedFilesList.length(); i++)
+            for (int i = 0; i < allowedFilesList.length(); i++) {
                 if (allowedFilesList.charAt(i) == ',') {
-                    if (!m_allowedFilesList.contains(ext))
+                    if (!m_allowedFilesList.contains(ext)) {
                         m_allowedFilesList.addElement(ext);
+                    }
                     ext = "";
                 } else {
                     ext = ext + allowedFilesList.charAt(i);
                 }
-            if (ext != "")
+            }
+            if (ext != "") {
                 m_allowedFilesList.addElement(ext);
+            }
         } else {
             m_allowedFilesList = null;
         }

@@ -46,7 +46,7 @@ import spinat.jettyprism.Configuration;
  *
  */
 public class DBPrism {
-
+    
     private static Logger log = Logger.getLogger(DBPrism.class);
     public static java.lang.String NAME = "DBPrism";
     public static java.lang.String VERSION = "2.1.2.2-production";
@@ -66,7 +66,6 @@ public class DBPrism {
      * steps
      */
     //private DBConnection connection = null;
-
     /**
      * Makes a page from Request If the request has not user/pass information
      * and the connection is with dymanic login throw NotAuthorizedException. If
@@ -109,7 +108,7 @@ public class DBPrism {
             boolean dLogin = "".equals(cc_tmp.usr);
             if (!dLogin) {
                 // if DAD username is not null, log to database using DAD username and password 
-                connection =  this.createDBConnection(cc_tmp, cc_tmp.usr, cc_tmp.pass);
+                connection = this.createDBConnection(cc_tmp, cc_tmp.usr, cc_tmp.pass);
                 if (log.isDebugEnabled()) {
                     log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                 }        // Copy DAD username and password from DAD info
@@ -124,7 +123,7 @@ public class DBPrism {
                 throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
             } else {
                 try { // DAD username is null, try to connect using B64 user/pass values
-                    connection =this.createDBConnection(cc_tmp, name, password);
+                    connection = this.createDBConnection(cc_tmp, name, password);
                     if (log.isDebugEnabled()) {
                         log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                     }
@@ -175,7 +174,7 @@ public class DBPrism {
      * @param res
      * @throws Exception
      */
-    public void downloadDocumentFromDB(HttpServletRequest req, HttpServletResponse res, ConnInfo cc_tmp ) throws Exception {
+    public void downloadDocumentFromDB(HttpServletRequest req, HttpServletResponse res, ConnInfo cc_tmp) throws Exception {
         String name;
         String password;
         DBConnection connection = null;
@@ -183,7 +182,7 @@ public class DBPrism {
             int i;
             String str;
             try {
-
+                
                 String s = req.getHeader("Authorization").substring(6);
                 byte[] bytes = DatatypeConverter.parseBase64Binary(s);
                 str = new String(bytes, cc_tmp.clientCharset);
@@ -230,7 +229,6 @@ public class DBPrism {
         }
     }
 
-
     /**
      * A public constructor to manage multiple connections
      */
@@ -246,7 +244,7 @@ public class DBPrism {
      * @param req
      * @throws SQLException
      */
-    private static void recycle(HttpServletRequest req, DBConnection connection ) throws SQLException {
+    private static void recycle(HttpServletRequest req, DBConnection connection) throws SQLException {
         // try to free the connection
         if (connection != null) {
             connection.releasePage();
@@ -292,7 +290,7 @@ public class DBPrism {
         try {
             cache = DBPrismConnectionCacheProxy.getInstance(properties);
         } catch (Exception e) {
-            log.error("Initialization of the DBPrismConnectionCacheProxy failed due to: " + e.getMessage(),e);
+            log.error("Initialization of the DBPrismConnectionCacheProxy failed due to: " + e.getMessage(), e);
         }
         if (log.isDebugEnabled()) {
             log.debug(".init exited.");
@@ -317,8 +315,8 @@ public class DBPrism {
         }
     }
     
-     private HashMap<String, OracleDataSource> dss = new HashMap<>();
-
+    private HashMap<String, OracleDataSource> dss = new HashMap<>();
+    
     DBConnection createDBConnection(ConnInfo ci, String user, String pw) throws SQLException {
         if (dss.containsKey(ci.connAlias)) {
             OracleConnection con = (OracleConnection) dss.get(ci.connAlias).getConnection(user, pw);
@@ -327,7 +325,7 @@ public class DBPrism {
         }
         OracleDataSource ds = new OracleDataSource();
         ds.setURL(ci.connectString);
-        dss.put(ci.connAlias,ds);
+        dss.put(ci.connAlias, ds);
         return this.createDBConnection(ci, user, pw);
     }
 }

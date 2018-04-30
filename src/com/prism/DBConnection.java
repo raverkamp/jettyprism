@@ -74,7 +74,7 @@ public class DBConnection {
     //static public final int CUSTOM = 4;
     public OracleConnection sqlconn;
     public ConnInfo connInfo;
-  
+
     protected static boolean flexibleCompact = false;
 
     protected java.lang.String toolkitVersion;
@@ -86,7 +86,6 @@ public class DBConnection {
     protected java.lang.String excludeList;
 
     static final int MAX_PL_LINES = 127;
-    
 
     /**
      * Template method calls<BR>
@@ -456,12 +455,12 @@ public class DBConnection {
      * Create a concrete DBConnection (DBConnPLSQL). Find extra properties
      * attributes of this connection and return a concrete connection object.
      */
-    public DBConnection(Configuration properties,ConnInfo cc,  OracleConnection sqlcon) {
+    public DBConnection(Configuration properties, ConnInfo cc, OracleConnection sqlcon) {
         DBConnection con = this;
         con.sqlconn = sqlcon;
         con.connInfo = cc;
-        con.toolkitVersion = 
-                 properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
+        con.toolkitVersion
+                = properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
         con.excludeList
                 = properties.getProperty("exclusion_list", "sys. owa dbms_ htp.",
                         "DAD_" + cc.connAlias);
@@ -976,7 +975,6 @@ public class DBConnection {
         return text_error.toString();
     }
 
-
     /**
      * Init method Find the definition of alias (global.alias) to get connection
      * information and put into dicc to store ConnInfo information
@@ -1000,7 +998,6 @@ public class DBConnection {
             }
         }
     }*/
-
     /**
      * Release method free all resources
      *
@@ -1013,8 +1010,7 @@ public class DBConnection {
             dicc = null;
         }
     }
-    */
-
+     */
     /**
      * return response form DB this is done by:
      *

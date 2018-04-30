@@ -7,9 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 // a simple replacement for JConfiguration or so
-
 public class Configuration {
-    
+
     public static class Category {
 
         final String name;
@@ -23,29 +22,29 @@ public class Configuration {
 
     final HashMap<String, Category> categories;
     final HashMap<String, String> general;
-    
+
     public static Configuration loadFromPropertiesFile(String fileName) throws IOException {
         java.util.Properties props = new java.util.Properties();
         try (InputStream ins = new FileInputStream(fileName)) {
-           props.load(ins);
+            props.load(ins);
         }
-        HashMap<String,Category> cats = new HashMap<>();
-        for(String key : props.stringPropertyNames()) {
+        HashMap<String, Category> cats = new HashMap<>();
+        for (String key : props.stringPropertyNames()) {
             int p = key.indexOf(".");
             int p2 = key.lastIndexOf(".");
             // exactly one . in string
-            if (p<0 || p!=p2) {
+            if (p < 0 || p != p2) {
                 continue;
             }
-            String cat = key.substring(0,p);
-            String subkey= key.substring(p+1);
-            
+            String cat = key.substring(0, p);
+            String subkey = key.substring(p + 1);
+
             if (!cats.containsKey(cat)) {
-                cats.put(cat, new Category(cat,new HashMap<String, String>()));
+                cats.put(cat, new Category(cat, new HashMap<String, String>()));
             }
-            cats.get(cat).map.put(subkey,(String) props.getProperty(key));
+            cats.get(cat).map.put(subkey, (String) props.getProperty(key));
         }
-        return new Configuration(cats,null);
+        return new Configuration(cats, null);
     }
 
     private Configuration(HashMap<String, Category> categories,
@@ -145,7 +144,7 @@ public class Configuration {
             return Integer.parseInt(s);
         }
     }
-  
+
     public String toString() {
         StringBuilder b = new StringBuilder();
         b.append("--- categories ---\n");

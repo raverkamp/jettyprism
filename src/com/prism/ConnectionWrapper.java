@@ -6,7 +6,6 @@
  * version 1.1, a copy of which has been included  with this distribution in *
  * the LICENSE file.                                                         *
  */
-
 package com.prism;
 
 import java.sql.SQLException;
@@ -14,18 +13,22 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * This class is a Wrapper that provides access from XSP pages to the DBPrism instance.
- * A client gets a JDBC connection from the Prism ResourceManger.
- * This connection has the same properties as Prism DBConnections,
- * such as Transactions, DAD information located by request info, and so on.<BR> 
+ * This class is a Wrapper that provides access from XSP pages to the DBPrism
+ * instance. A client gets a JDBC connection from the Prism ResourceManger. This
+ * connection has the same properties as Prism DBConnections, such as
+ * Transactions, DAD information located by request info, and so on.<BR>
  * <BR>
- * Modified: 2/Dec/2003 by <a href="mailto:pyropunk@usa.net">Alexander Graesser</a> (LXG)<BR>
+ * Modified: 2/Dec/2003 by <a href="mailto:pyropunk@usa.net">Alexander
+ * Graesser</a> (LXG)<BR>
  * Changes : <UL><LI>Added log4j logging</LI>
- *           <LI>JavDoc cleanup</LI>
- *           <LI>code cleanup</LI></UL>
+ * <LI>JavDoc cleanup</LI>
+ * <LI>code cleanup</LI></UL>
  */
 public class ConnectionWrapper {
-    /** Get one connection, create it, if there isn't * @param req
+
+    /**
+     * Get one connection, create it, if there isn't * @param req
+     *
      * @param req HttpServletRequest
      * @param usr String
      * @param pass String
@@ -45,8 +48,9 @@ public class ConnectionWrapper {
 //        ConnInfo cc_tmp = null ; //new ConnInfo(req);
 //        return getConnection(req, cc_tmp.usr, cc_tmp.pass);
 //    }
-
-    /** Release one Connection * @param req
+    /**
+     * Release one Connection * @param req
+     *
      * @param req HttpServletRequest
      * @param conn DBConnection
      * @throws SQLException

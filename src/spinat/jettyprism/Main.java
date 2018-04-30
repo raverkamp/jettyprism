@@ -136,7 +136,7 @@ public class Main {
 
         // !! This is a raw Servlet, not a servlet that has been configured through a web.xml or anything like that !!
         ServletHolder holder = new ServletHolder(com.prism.ServletWrapper.class);
-        
+
         File pc = propertyFile; //new File(prismconf).getAbsoluteFile();
         if (pc.canRead()) {
             holder.setInitParameter("properties", pc.toString());
