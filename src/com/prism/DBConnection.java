@@ -10,10 +10,8 @@ package com.prism;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -750,9 +748,7 @@ public class DBConnection {
             log.warn(".releasePage - exception on commit due: ", e);
         } finally {
             try {
-                if (((OracleConnection) sqlconn).isProxySession()) {
-                    ((OracleConnection) sqlconn).close(((OracleConnection) sqlconn).PROXY_SESSION);
-                }
+                sqlconn.close();
             } catch (SQLException s) {
                 log.warn(".releasePage - exception closing proxy session: ", s);
             }
@@ -978,42 +974,6 @@ public class DBConnection {
         return text_error.toString();
     }
 
-    /**
-     * Init method Find the definition of alias (global.alias) to get connection
-     * information and put into dicc to store ConnInfo information
-     *
-     * @param props Configuration
-     * @throws Exception
-     */
-    /*public static void init(Configuration props) throws Exception {
-        String flexibleRequest, connAlias;
-        flexibleRequest = props.getProperty("flexibleRequest", "old");
-        flexibleCompact = flexibleRequest.equalsIgnoreCase("compact");
-        connAlias = props.getProperty("alias", "");
-        this. = ConnInfo(aliasdef);
-        if (dicc == null) {
-            dicc = new Hashtable();
-            properties = props;
-            StringTokenizer st = new StringTokenizer(connAlias, " ");
-            while (st.hasMoreElements()) {
-                String aliasdef = (String) st.nextElement();
-                dicc.put(aliasdef, new ConnInfo(aliasdef));
-            }
-        }
-    }*/
-    /**
-     * Release method free all resources
-     *
-     * @throws Exception
-     */
-    /*public static void release()  {
-        if (dicc != null) {
-            properties = null;
-            dicc.clear();
-            dicc = null;
-        }
-    }
-     */
     /**
      * return response form DB this is done by:
      *

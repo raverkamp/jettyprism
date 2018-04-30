@@ -22,9 +22,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
@@ -32,32 +31,16 @@ public class SPProc {
 
     private Logger log = Logger.getLogger(SPProc.class); //JHK
 
-    protected Hashtable procedures = new Hashtable();
-    protected Hashtable arguments = new Hashtable();
+    protected HashMap<String, HashMap> procedures = new HashMap<>();
+    protected HashMap<String, ArrayList> arguments = new HashMap<>();
 
     /**
      * create a new entry for this procedure definition every procedure
      * definition is knew by the overload index value
      */
     public void addProcedure(String index) {
-        procedures.put(index, new Hashtable());
-        arguments.put(index, new Vector());
-    }
-
-    /**
-     * return all overload definitions for this procedure every definition of a
-     * procedure is a Vector with the arguments names
-     */
-    public Enumeration getAll() {
-        return arguments.elements();
-    }
-
-    /**
-     * gets the argument list for this overload version of the Stored Procedure
-     * the argument list is a Hashtable with argument_name / type_name values
-     */
-    public Vector getArgumentList(String overloadIndex) {
-        return (Vector) arguments.get(overloadIndex);
+        procedures.put(index, new HashMap());
+        arguments.put(index, new ArrayList());
     }
 
     /**
@@ -65,10 +48,10 @@ public class SPProc {
      * overloaded procedure entry there are entrys for each argument name
      */
     public void add(String overloadIndex, String argumentName, String argumentType) {
-        Hashtable procedure = (Hashtable) procedures.get(overloadIndex);
-        Vector args = (Vector) arguments.get(overloadIndex);
+        HashMap procedure = procedures.get(overloadIndex);
+        ArrayList args = arguments.get(overloadIndex);
         procedure.put(argumentName, argumentType);
-        args.addElement(argumentName);
+        args.add(argumentName);
         if (log.isDebugEnabled()) //JHK
         {
             log.debug("into : " + overloadIndex + " arg_name: " + argumentName + " inserted with type: " + argumentType);
@@ -91,7 +74,7 @@ public class SPProc {
             {
                 log.debug("trying " + overloadIndex);
             }
-            Hashtable procedure = (Hashtable) procedures.get(overloadIndex);
+            HashMap procedure = procedures.get(overloadIndex);
             if (procedure == null) {
                 return null;
             }
@@ -220,7 +203,7 @@ public class SPProc {
             if (log.isDebugEnabled()) {
                 log.debug("trying " + overloadIndex);
             }
-            Hashtable procedure = (Hashtable) procedures.get(overloadIndex);
+            HashMap procedure = procedures.get(overloadIndex);
             if (procedure == null) {
                 return null;
             }
@@ -254,11 +237,11 @@ public class SPProc {
      * part of procedure to be an array instead of simple String
      */
     public void add(String overloadIndex, String argumentName, String argumentType, String argumentCategory) {
-        Hashtable procedure = (Hashtable) procedures.get(overloadIndex);
-        Vector args = (Vector) arguments.get(overloadIndex);
+        HashMap procedure = procedures.get(overloadIndex);
+        ArrayList args = arguments.get(overloadIndex);
         // String[] argsig = {argumentType, argumentCategory}; // LXG
         procedure.put(argumentName, argumentType);
-        args.addElement(argumentName);
+        args.add(argumentName);
         if (log.isDebugEnabled()) //JHK
         {
             log.debug("into : " + overloadIndex + " arg_name: " + argumentName + " inserted with type: " + argumentType + " category: " + argumentCategory);

@@ -11,7 +11,6 @@ package com.prism;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 /**
  * This class stores the Stored Procedures information called to increase

@@ -103,12 +103,6 @@ public class DBPrism {
                 if (log.isDebugEnabled()) {
                     log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                 }        // Copy DAD username and password from DAD info
-                if ("".equalsIgnoreCase(name)) {
-                    name = cc_tmp.usr;
-                }
-                if ("".equalsIgnoreCase(password)) {
-                    password = cc_tmp.pass;
-                }
             } else if ("".equals(name) || "".equals(password)) {
                 // if DAD username is null, and no user/pass is given into the B64 string 
                 throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
