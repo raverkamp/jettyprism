@@ -37,11 +37,6 @@ public class DBFactory {
         super();
     }
 
-    public SPProc createSPProc(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
-        SPProc cc = new SPProc();
-        return cc.create(conn, procname, sqlconn);
-    }
-
     /**
      * This method returns a concrete DBConnPLSQL instance.
      */

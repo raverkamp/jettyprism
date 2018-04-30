@@ -58,7 +58,7 @@ public class ConnInfo {
     public DBFactory factory;
     public java.lang.String clientCharset = "iso-8859-1";
     //public java.lang.String dbCharset = "iso-8859-1";
-    private static Configuration properties;
+
     public int status = CONN_FREE;
     // owa_public.owa_util.ident_arr information for 7x support
     public java.lang.String type_owner;
@@ -68,25 +68,6 @@ public class ConnInfo {
     public java.lang.String flexible_escape_char;
     public java.lang.String xform_escape_char;
     public java.lang.String xform_param_name;
-
-    /**
-     * This method is called once by the ResourceManager. It stores the
-     * properties information in a class variable to be available for all
-     * objects of DBConnection.
-     *
-     * @param props Configuration
-     */
-    public static synchronized void init(Configuration props) {
-        properties = props;
-    }
-
-    /**
-     * This method is called once by the ResourceManager. It cleanup the
-     * properties information in the class variable.
-     */
-    public static synchronized void release() {
-        properties = null;
-    }
 
     /**
      * This method makes a ConnInfo objects through the aliasdef Connection
@@ -102,7 +83,7 @@ public class ConnInfo {
      * @param aliasdef String
      * @throws Exception
      */
-    public ConnInfo(String aliasdef) {
+    public ConnInfo(Configuration properties, String aliasdef) {
         //JHK who are we initializing
         if (log.isDebugEnabled()) {
             log.debug("Initializing connection: " + aliasdef);

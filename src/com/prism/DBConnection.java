@@ -106,14 +106,13 @@ public class DBConnection {
      */
     // LXG: removed exceptions ExecutionErrorPageException and ExecutionErrorMsgException since they are not thrown
     // public void doCall(HttpServletRequest req, String usr, String pass) throws SQLException, NotAuthorizedException, UnsupportedEncodingException, IOException {
-    public void doCall(HttpServletRequest req, String usr, String pass) throws
+    public void doCall(DBProcedure proccache, HttpServletRequest req) throws
             SQLException, NotAuthorizedException, UnsupportedEncodingException, IOException,
             ProcedureNotFoundException,
             ExecutionException {
         if (log.isDebugEnabled()) {
             log.debug(".doCall entered.");
         }
-        String connectedUsr = usr;
         if (connInfo.proxyUser) { // Sanity checks
             String proxyUserName = (req.getUserPrincipal() != null) ? req.getUserPrincipal().getName() : req.getRemoteUser();
             if (proxyUserName == null || proxyUserName.length() == 0) {
@@ -128,7 +127,7 @@ public class DBConnection {
             proxyUserInfo.put("PROXY_USER_NAME", proxyUserName);
             ((OracleConnection) sqlconn).openProxySession(OracleConnection.PROXYTYPE_USER_NAME, proxyUserInfo);
             log.debug(".doCall - Proxy user: " + proxyUserName);
-            connectedUsr = proxyUserName;
+            //connectedUsr = proxyUserName;
         }
         String ppackage = getPackage(req);
         // LXG: removed - unused.
@@ -140,7 +139,7 @@ public class DBConnection {
 
         resetPackages();
 
-        setCGIVars(req, connectedUsr, pass);
+        setCGIVars(req, "", "");
         int authStatus = doAuthorize(connInfo.customAuthentication, ppackage);
         if (authStatus != 1) {
             String realms = getRealm();
@@ -164,13 +163,13 @@ public class DBConnection {
             // Handle multipart post, sent it as binary stream in a BLOB argument
             UploadRequest multi = connInfo.factory.createUploadRequest(req, this);
             // Calls the stored procedures with the new request
-            doIt(multi, getSPCommand(multi));
+            doIt(proccache, multi, getSPCommand(multi));
         } else if (command.startsWith(connInfo.flexible_escape_char)) // Calls the stored procedures with the wrapper request
         {
             if (flexibleCompact) {
-                doIt(new FlexibleRequestCompact(req), command.substring(connInfo.flexible_escape_char.length()));
+                doIt(proccache, new FlexibleRequestCompact(req), command.substring(connInfo.flexible_escape_char.length()));
             } else {
-                doIt(new FlexibleRequest(req), command.substring(connInfo.flexible_escape_char.length()));
+                doIt(proccache, new FlexibleRequest(req), command.substring(connInfo.flexible_escape_char.length()));
             }
         } else if (command.startsWith(connInfo.xform_escape_char)) // Calls the stored procedures with the wrapper request
         {
@@ -178,7 +177,7 @@ public class DBConnection {
         } //doIt(new XFormsRequest(req,connInfo), command.substring(1));
         else // Calls the stored procedures with the actual request
         {
-            doIt(req, command);
+            doIt(proccache, req, command);
         }
         if (log.isDebugEnabled()) {
             log.debug(".doCall exited.");
@@ -212,7 +211,8 @@ public class DBConnection {
      * @throws java.sql.SQLException
      * @throws java.io.UnsupportedEncodingException
      */
-    public void doIt(HttpServletRequest req,
+    public void doIt(DBProcedure proccache,
+            HttpServletRequest req,
             String servletname) throws SQLException,
             UnsupportedEncodingException,
             ProcedureNotFoundException,
@@ -258,7 +258,7 @@ public class DBConnection {
         //we will set array variables here
         int foundcount = 0;
         SPProc plp
-                = DBPrism.proccache.get(connInfo, servletname, sqlconn);
+                = proccache.get(connInfo, servletname, sqlconn);
         //JHK, to use overloaded get
         // Build procedure call parameter by parameter
         Enumeration real_args = req.getParameterNames();

@@ -40,6 +40,7 @@ import oracle.jdbc.OracleDriver;
 import oracle.jdbc.pool.OracleDataSource;
 
 import org.apache.log4j.Logger;
+import spinat.jettyprism.Configuration;
 
 /**
  * Servlet wrapper class for Prism.<BR>
@@ -55,6 +56,7 @@ public class ServletWrapper extends HttpServlet {
 
     private static Logger log = Logger.getLogger(ServletWrapper.class);
     private DBPrism dbprism = null;
+    private Configuration properties;
 
     public ServletWrapper() {
         // LXG: call to super is generated anyway but put it here for clarity.
@@ -78,7 +80,8 @@ public class ServletWrapper extends HttpServlet {
             log.debug("servlet initialised.");
             // LXG: now intialise DBPrism
             this.dbprism = new DBPrism();
-            this.dbprism.init(propfilename);
+            this.properties = Configuration.loadFromPropertiesFile(propfilename);
+            this.dbprism.init(properties);
         } catch (Exception e) {
             log.error("Error Loading " + sc.getInitParameter("properties"), e);
             throw new ServletException(e);
@@ -95,18 +98,10 @@ public class ServletWrapper extends HttpServlet {
         String errorPage = "/error.html";
         String alias = getAliasFromURI(req);
         try {
-            ConnInfo cc_tmp = new ConnInfo(alias);
-            errorLevel = cc_tmp.errorLevel;
-            errorPage = cc_tmp.errorPage;
-            String pathInfo = req.getPathInfo();
-            // checks for download functionality
-            if (pathInfo != null
-                    && pathInfo.startsWith("/" + cc_tmp.docAccessPath + "/")) {
-                this.dbprism.downloadDocumentFromDB(req, res, cc_tmp);
-            } else {
-                Content r = this.dbprism.makePage(req, cc_tmp);
-                showPage(req, res, r);
-            }
+            ConnInfo cc_tmp = new ConnInfo(this.properties, alias);
+            Content r = this.dbprism.makePage(req, cc_tmp);
+            showPage(req, res, r);
+
         } catch (NotAuthorizedException ne) {
             sendUnauthorized(res, ne.getMessage());
         } catch (ProcedureNotFoundException e) {

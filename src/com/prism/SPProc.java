@@ -32,13 +32,8 @@ public class SPProc {
 
     private Logger log = Logger.getLogger(SPProc.class); //JHK
 
-    protected Hashtable procedures; //JHK
-    protected Hashtable arguments;  //JHK
-
-    public SPProc() {
-        procedures = new Hashtable();
-        arguments = new Hashtable();
-    }
+    protected Hashtable procedures = new Hashtable();
+    protected Hashtable arguments = new Hashtable();
 
     /**
      * create a new entry for this procedure definition every procedure
@@ -122,11 +117,10 @@ public class SPProc {
      * @return SPProc
      * @throws SQLException
      */
-    public SPProc create(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
+    public SPProc(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
         if (log.isDebugEnabled()) {
             log.debug(".create overload for: '" + procname + "'");
         }
-        SPProc plp = new SPProc();
         final String owner;
         final String plpackage;
         final String plprocedure;
@@ -172,7 +166,7 @@ public class SPProc {
                         overload = "1";
                     }
                     if (!old_overload.equals(overload)) {
-                        plp.addProcedure(overload);
+                        this.addProcedure(overload);
                         old_overload = overload;
                     }
                     // if procedure has no argument, empty row is returned
@@ -190,21 +184,19 @@ public class SPProc {
                         String type_owner = rs.getString(4);
                         String type_name = rs.getString(5);
                         String type_subname = rs.getString(6);
-                        plp.add(overload, argument_name, type_owner + "." + type_name + "." + type_subname, category);
+                        this.add(overload, argument_name, type_owner + "." + type_name + "." + type_subname, category);
                         if (log.isDebugEnabled()) {
                             log.debug("            overload: " + overload + " arg: " + argument_name + " data_type: " + data_type + " type_name: " + type_owner + "." + type_name + "." + type_subname);
                         }
                         rs.next();
                     } else { // argument is SCALAR variable
-                        plp.add(overload, argument_name, data_type, "SCALAR");
+                        this.add(overload, argument_name, data_type, "SCALAR");
                         if (log.isDebugEnabled()) {
                             log.debug("            overload: " + overload + " arg: " + argument_name + " data_type: " + data_type + " category: SCALAR");
                         }
                     }
                 }
-                if (exists) {
-                    return plp;
-                } else {
+                if (!exists) {
                     throw new ProcedureNotFoundException("could not find procedure: " + procname);
                 }
             }

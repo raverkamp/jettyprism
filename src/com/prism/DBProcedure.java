@@ -34,7 +34,7 @@ public class DBProcedure extends Hashtable {
         SPProc plp = (SPProc) get(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname);
         if (plp == null) { // plp is not in cache yet
             DBFactory ff = conn.getFactory();
-            plp = ff.createSPProc(conn, procname, sqlconn);
+            plp = new SPProc(conn, procname, sqlconn);
             if (shouldCache) {
                 put(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname, plp);
             }

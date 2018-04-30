@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
@@ -46,7 +47,7 @@ import spinat.jettyprism.Configuration;
  *
  */
 public class DBPrism {
-    
+
     private static Logger log = Logger.getLogger(DBPrism.class);
     public static java.lang.String NAME = "DBPrism";
     public static java.lang.String VERSION = "2.1.2.2-production";
@@ -56,9 +57,8 @@ public class DBPrism {
     public static java.lang.String UnauthorizedText;
     public static int maxUploadSize = 8192 * 1024;
     public static int BEHAVIOR = 0;
-    public static DBPrismConnectionCacheProxy cache = null;
-    public static DBProcedure proccache = null;
-    private static boolean cachep = true;
+    public DBProcedure proccache = null;
+    private boolean cachep = true;
     private Configuration properties = null;
 
     /**
@@ -136,7 +136,7 @@ public class DBPrism {
                     throw e;
                 }
             }
-            connection.doCall(req, name, password);
+            connection.doCall(proccache, req);
             Content pg = connection.getGeneratedStream(req);
             if (log.isDebugEnabled()) {
                 log.debug(".makePage doCall success on " + connection);
@@ -182,7 +182,7 @@ public class DBPrism {
             int i;
             String str;
             try {
-                
+
                 String s = req.getHeader("Authorization").substring(6);
                 byte[] bytes = DatatypeConverter.parseBase64Binary(s);
                 str = new String(bytes, cc_tmp.clientCharset);
@@ -200,7 +200,7 @@ public class DBPrism {
             boolean dLogin = "".equals(cc_tmp.usr);
             if (!dLogin) {
                 // if DAD username is not null, log to database using DAD username and password 
-                connection = cache.get(cc_tmp.connAlias, cc_tmp.usr, cc_tmp.pass);
+                connection = this.createDBConnection(cc_tmp, cc_tmp.usr, cc_tmp.pass);
                 if (log.isDebugEnabled()) {
                     log.debug("Using a " + connection.getClass().getName() + " class");  // JHK
                 }        // Copy DAD username and password from DAD info
@@ -215,7 +215,7 @@ public class DBPrism {
                 throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
             } else {
                 try { // DAD username is null, try to connect using B64 user/pass values
-                    connection = cache.get(cc_tmp.connAlias, name, password);
+                    connection = this.createDBConnection(cc_tmp, name, password);
                 } catch (SQLException e) {
                     throw new NotAuthorizedException(cc_tmp.dynamicLoginRealm);
                 }
@@ -248,7 +248,6 @@ public class DBPrism {
         // try to free the connection
         if (connection != null) {
             connection.releasePage();
-            cache.release(req, connection);
         }
     }
 
@@ -259,39 +258,22 @@ public class DBPrism {
      * @param filename
      * @throws IOException
      */
-    public void init(String filename) throws IOException {
+    public void init(Configuration properties) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(".init entered.");
         }
-        String propFileName = filename;
-        if (log.isDebugEnabled()) {
-            log.debug(".init about to load properties: " + propFileName);
-        }
-        //  ConfigurationManager cm = ConfigurationManager.getInstance();
-        try {
-            // LXG: changed to static access
-            properties = Configuration.loadFromPropertiesFile(filename);    //ConfigurationManager.getConfiguration("prism.xconf");
-            System.out.println(properties.toString());
-        } catch (Exception e) {
-            log.error(".init Could not load properties file: " + propFileName, e);
-            // LXG: use the correct file name when throwing the error
-            throw new IOException("Can't load properties file '" + propFileName + "'\n Make sure properties file in CLASSPATH" + "\n or give 'properties' argument in Servlet Config");
-        }
+        this.properties = properties;
+
         // Set global DB Prism variables
         //LANG = properties.getProperty("lang");
         //COUNTRY = properties.getProperty("country");
-        
         CONTENTTYPE = properties.getProperty("contenttype", "text/html");
         UnauthorizedText = properties.getProperty("UnauthorizedText", "You must be enter DB username and password to access at the system");
         BEHAVIOR = properties.getIntProperty("behavior", 0);
         maxUploadSize = properties.getIntProperty("maxUploadSize", 8388608);
         cachep = properties.getBooleanProperty("cacheprocedure", true);
         proccache = new DBProcedure(cachep);
-        try {
-            cache = DBPrismConnectionCacheProxy.getInstance(properties);
-        } catch (Exception e) {
-            log.error("Initialization of the DBPrismConnectionCacheProxy failed due to: " + e.getMessage(), e);
-        }
+
         if (log.isDebugEnabled()) {
             log.debug(".init exited.");
         }
@@ -306,17 +288,17 @@ public class DBPrism {
         if (log.isDebugEnabled()) {
             log.debug(".release entered.");
         }
-        if (cache != null) {
-            cache.release();
-            cache = null;
+        for (Map.Entry<String, OracleDataSource> e : this.dss.entrySet()) {
+            e.getValue().close();
         }
+        this.dss.clear();
         if (log.isDebugEnabled()) {
             log.debug(".release DBPrism shutdown complete.");
         }
     }
-    
+
     private HashMap<String, OracleDataSource> dss = new HashMap<>();
-    
+
     DBConnection createDBConnection(ConnInfo ci, String user, String pw) throws SQLException {
         if (dss.containsKey(ci.connAlias)) {
             OracleConnection con = (OracleConnection) dss.get(ci.connAlias).getConnection(user, pw);
