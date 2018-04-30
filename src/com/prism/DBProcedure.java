@@ -10,15 +10,18 @@ package com.prism;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 /**
  * This class stores the Stored Procedures information called to increase
  * performance in the following calls.
  */
-public class DBProcedure extends Hashtable {
+public class DBProcedure {
 
     private boolean shouldCache = false;
+
+    private HashMap<String, SPProc> cache = new HashMap<>();
 
     /**
      * If the parameter is true works as cache
@@ -30,13 +33,12 @@ public class DBProcedure extends Hashtable {
     /**
      * Gets or creates a instance of DBProcedure objects from cache.
      */
-    public SPProc get(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
-        SPProc plp = (SPProc) get(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname);
+    public synchronized SPProc get(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
+        SPProc plp = this.cache.get(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname);
         if (plp == null) { // plp is not in cache yet
-            DBFactory ff = conn.getFactory();
             plp = new SPProc(conn, procname, sqlconn);
             if (shouldCache) {
-                put(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname, plp);
+                this.cache.put(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname, plp);
             }
         }
         return plp;

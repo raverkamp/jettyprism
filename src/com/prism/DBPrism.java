@@ -284,30 +284,36 @@ public class DBPrism {
      *
      * @throws Exception
      */
-    public void release() throws Exception {
+    public synchronized void release() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug(".release entered.");
         }
-        for (Map.Entry<String, OracleDataSource> e : this.dss.entrySet()) {
+        for (Map.Entry<String, OracleDataSource> e : this.datasources.entrySet()) {
             e.getValue().close();
         }
-        this.dss.clear();
+        this.datasources.clear();
         if (log.isDebugEnabled()) {
             log.debug(".release DBPrism shutdown complete.");
         }
     }
 
-    private HashMap<String, OracleDataSource> dss = new HashMap<>();
+    private final HashMap<String, OracleDataSource> datasources = new HashMap<>();
 
-    DBConnection createDBConnection(ConnInfo ci, String user, String pw) throws SQLException {
-        if (dss.containsKey(ci.connAlias)) {
-            OracleConnection con = (OracleConnection) dss.get(ci.connAlias).getConnection(user, pw);
-            con.setAutoCommit(false);
-            return new DBConnection(this.properties, ci, con);
+    private synchronized OracleDataSource getDataSource(ConnInfo ci) throws SQLException {
+        if (datasources.containsKey(ci.connAlias)) {
+            return datasources.get(ci.connAlias);
         }
         OracleDataSource ds = new OracleDataSource();
         ds.setURL(ci.connectString);
-        dss.put(ci.connAlias, ds);
-        return this.createDBConnection(ci, user, pw);
+        datasources.put(ci.connAlias, ds);
+        return ds;
+
+    }
+
+    DBConnection createDBConnection(ConnInfo ci, String user, String pw) throws SQLException {
+        OracleDataSource ds = getDataSource(ci);
+        OracleConnection con = (OracleConnection) ds.getConnection(user, pw);
+        con.setAutoCommit(false);
+        return new DBConnection(this.properties, ci, con);
     }
 }
