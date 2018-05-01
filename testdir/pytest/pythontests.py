@@ -39,7 +39,7 @@ def flextest(baseurl):
     r.raise_for_status()
     res = r.json()
     if not res == args:
-        raise Exception("flxe result is wrong")
+        raise Exception("flex result is wrong")
 
 def main():
     parser = argparse.ArgumentParser(description='do some tests')
