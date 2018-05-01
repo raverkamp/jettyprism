@@ -116,20 +116,11 @@ public class ServletWrapper extends HttpServlet {
         } catch (ExecutionException e) {
             sendFailureMsg(res, e.getMessage());
         } catch (Exception e) {
-            String emsg = e.getMessage();
-            if (emsg == null) {
-                e.printStackTrace();
-                StringWriter msgw = new StringWriter();
-                e.printStackTrace(new PrintWriter(msgw));
-                emsg
-                        = "Can't get message for this exception, printing stack trace: "
-                        + msgw.toString();
-            }
             log.error(".service unhandled exception.", e);
             if (errorLevel == 1) {
                 sendFailurePage(res, errorPage);
             } else if (errorLevel == 2) {
-                sendFailureMsg(res, emsg);
+                sendFailureMsg(res, e.getMessage());
             } else {
                 sendErrorPage(res);
             }
@@ -155,13 +146,7 @@ public class ServletWrapper extends HttpServlet {
     }
 
     public String getServletInfo() {
-        try {
-            DBPrism glassPrism = new DBPrism();
-            return glassPrism.getVersion();
-        } catch (Exception e) {
-            log.error("Could not get DB Prism Version", e);
-        }
-        return "Could not get DB Prism Version";
+        return this.dbprism.getVersion();
     }
 
     public void sendUnauthorized(HttpServletResponse res,
@@ -200,6 +185,7 @@ public class ServletWrapper extends HttpServlet {
             log.debug(".sendFailureMsg generated error page " + reason);
         }
         res.setContentType(this.defaultContentType);
+        res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         out.println("<html><head></head><body BGCOLOR=\"#ffffff\">");
         out.println("<h3>Servlet Wrapper Error Page</h3><pre>");
         out.println(reason);

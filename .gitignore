@@ -3,3 +3,4 @@
 /dist/*
 /nbproject/private/*
 /libs/ojdbc8.jar
+/testdir/pytest/pyenv/*
