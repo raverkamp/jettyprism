@@ -229,12 +229,6 @@ public class DBPrism {
         }
     }
 
-    /**
-     * A public constructor to manage multiple connections
-     *
-     * @param req
-     * @throws SQLException
-     */
     private static void recycle(HttpServletRequest req, DBConnection connection) throws SQLException {
         // try to free the connection
         if (connection != null) {
@@ -242,13 +236,6 @@ public class DBPrism {
         }
     }
 
-    /**
-     * Initialize the singleton instance and the ResourceManger that is another
-     * singleton
-     *
-     * @param filename
-     * @throws IOException
-     */
     public void init(Configuration properties) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(".init entered.");

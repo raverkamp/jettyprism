@@ -3,8 +3,11 @@ package spinat.jettyprism;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 // a simple replacement for JConfiguration or so
 public class Configuration {
@@ -22,12 +25,8 @@ public class Configuration {
 
     final HashMap<String, Category> categories;
     final HashMap<String, String> general;
-
-    public static Configuration loadFromPropertiesFile(String fileName) throws IOException {
-        java.util.Properties props = new java.util.Properties();
-        try (InputStream ins = new FileInputStream(fileName)) {
-            props.load(ins);
-        }
+    
+    public static Configuration loadFromProperties(java.util.Properties props) {
         HashMap<String, Category> cats = new HashMap<>();
         for (String key : props.stringPropertyNames()) {
             int p = key.indexOf(".");
@@ -46,6 +45,28 @@ public class Configuration {
         }
         return new Configuration(cats, null);
     }
+    
+    public static Configuration loadFromPropertiesFile(String fileName) throws IOException {
+        java.util.Properties props = new java.util.Properties();
+        try (InputStream ins = new FileInputStream(fileName)) {
+            props.load(ins);
+        }
+        return loadFromProperties(props);
+    }
+    
+    public static Configuration loadFromPropertiesString(String s) throws IOException {
+        StringReader sr = new StringReader(s);
+        java.util.Properties props = new java.util.Properties();
+        props.load(sr);
+        return loadFromProperties(props);
+    }
+    
+    public static String storePropertiesAsString(Properties props) throws IOException {
+        StringWriter w = new StringWriter();
+        props.store(w,"");
+        return w.toString();
+    }
+    
 
     private Configuration(HashMap<String, Category> categories,
             HashMap<String, String> variables) {

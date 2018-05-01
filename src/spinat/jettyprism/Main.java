@@ -17,14 +17,18 @@ package spinat.jettyprism;
 //  You may elect to redistribute this code under either of these licenses.
 //  ========================================================================
 //
+import java.io.Console;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.jetty.server.Handler;
@@ -49,18 +53,21 @@ public class Main {
             throw new RuntimeException("Expecting one argument, the name of the configuration file");
         }
         String propFileName = args[0];
-        java.util.Properties props = new java.util.Properties();
+        Properties props = new Properties();
         File apf = new File(propFileName).getAbsoluteFile();
         if (!apf.canRead()) {
             throw new RuntimeException("can not read file: " + apf);
         }
         msg("using property file: " + apf);
+        FileReader fr = new FileReader(apf);
+        props.load(fr);
+        fillPasswords(props);
+        
         File dpf = apf.getParentFile();
         msg("setting user.dir to " + dpf.toString());
         System.setProperty("user.dir", dpf.toString());
 
-        FileReader fr = new FileReader(apf);
-        props.load(fr);
+       
 
         String log4jprops = props.getProperty("log4jconfig", "");
         if (log4jprops.equals("")) {
@@ -105,7 +112,7 @@ public class Main {
         // or programmatically obtain it for use in test cases.
         HandlerList handlers = new HandlerList();
 
-        Handler dadHandler = createDADHandler(props, apf);
+        Handler dadHandler = createDADHandler(props);
 
         ArrayList<Handler> l = createStaticHandler(props);
         for (Handler h : l) {
@@ -129,27 +136,19 @@ public class Main {
         server.join();
     }
 
-    static Handler createDADHandler(java.util.Properties props, File propertyFile) {
+    static Handler createDADHandler(Properties props) throws IOException {
         ServletContextHandler handler = new ServletContextHandler();
         // Passing in the class for the servlet allows jetty to instantite an instance of that servlet and mount it
         // on a given context path.
         // !! This is a raw Servlet, not a servlet that has been configured through a web.xml or anything like that !!
         ServletHolder holder = new ServletHolder(com.prism.ServletWrapper.class);
-
-        File pc = propertyFile; //new File(prismconf).getAbsoluteFile();
-        if (pc.canRead()) {
-            holder.setInitParameter("properties", pc.toString());
-        } else {
-            msg("ERROR: can not read config file: " + pc.toString());
-            System.exit(1);
-        }
-        msg("dbprism config " + pc.toString());
+        holder.setInitParameter("properties_string", Configuration.storePropertiesAsString(props));
         String dads = props.getProperty("dads", "/dads");
         handler.addServlet(holder, dads + "/*");
         return handler;
     }
 
-    static ArrayList<Handler> createStaticHandler(java.util.Properties props) {
+    static ArrayList<Handler> createStaticHandler(Properties props) {
         ArrayList<Handler> res = new ArrayList<>();
         HashSet<String> set = new HashSet<>();
         for (String s : props.stringPropertyNames()) {
@@ -201,6 +200,34 @@ public class Main {
             res.add(contextHandler);
         }
         return res;
+
+    }
+
+    static void fillPasswords(Properties props) {
+        Console cons = System.console();
+        if (cons == null) {
+            return;
+        }
+        Configuration c = Configuration.loadFromProperties(props);
+        String aliases = c.getProperty("alias");
+        StringTokenizer st = new StringTokenizer(aliases, " ");
+        while (st.hasMoreElements()) {
+            String alias = st.nextToken();
+            if (alias.equals("")) {
+                continue;
+            }
+            String user
+                    = c.getProperty("dbusername", "", "DAD_" + alias);
+            String pass
+                    = c.getProperty("dbpassword", "", "DAD_" + alias);
+            String connectStr = c.getProperty("connectString", "", "DAD_" + alias);
+            if (!user.equals("") && pass.equals("")) {
+                cons.writer().append("Enter Password for ").append(user).append("@").append(connectStr).append("\n");
+                char[] x = cons.readPassword("pw for %s:", alias);
+                String s = new String(x);
+                props.put("DAD_" + alias +".dbpassword" , s);
+            }
+        }
 
     }
 

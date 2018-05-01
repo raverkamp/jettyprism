@@ -28,7 +28,7 @@ general.errorPage: /404.html
 general.LoginTimeout: 10
 general.MinLimit: 0
 general.flexibleRequest: compact
-general.alias: x
+general.alias: x y
 general.dynamicLoginRealm: new DB Login
 general.behavior: 2
 general.CacheScheme: FixedWait
@@ -40,3 +40,7 @@ DAD_x.dynamicLoginRealm: This is X.
 DAD_x.connectString: jdbc:oracle:thin:@localhost:1521:xe
 DAD_x.dbusername=user_jp
 DAD_x.dbpassword=user_jp
+DAD_y.dynamicLoginRealm: This is Y.
+DAD_y.connectString: jdbc:oracle:thin:@localhost:1521:xe
+DAD_y.dbusername=user_jp
+#DAD_y.dbpassword=user_jp

@@ -70,20 +70,25 @@ public class ServletWrapper extends HttpServlet {
         super.init(sc);
 
         try {
-            String propfilename = sc.getInitParameter("properties");
-            if (propfilename == null) {
-                String res = sc.getInitParameter("ressource");
-                if (res == null) {
-                    res = "prism.xconf";
+            String propsString = sc.getInitParameter("properties_string");
+            if (propsString != null) {
+                this.properties = Configuration.loadFromPropertiesString(propsString);
+            } else {
+                String propfilename = sc.getInitParameter("properties");
+                if (propfilename == null) {
+                    String res = sc.getInitParameter("ressource");
+                    if (res == null) {
+                        res = "prism.xconf";
+                    }
+                    URL url = this.getServletContext().getResource("/WEB-INF/" + res);
+                    propfilename = url.toExternalForm().substring("file:".length());
                 }
-                URL url = this.getServletContext().getResource("/WEB-INF/" + res);
-                propfilename = url.toExternalForm().substring("file:".length());
+                this.properties = Configuration.loadFromPropertiesFile(propfilename);
             }
             log.debug("<<<<<<<<<<<<<<< DBPrism Servlet init >>>>>>>>>>>>>>>");
             log.debug("servlet initialised.");
             // LXG: now intialise DBPrism
             this.dbprism = new DBPrism();
-            this.properties = Configuration.loadFromPropertiesFile(propfilename);
             this.dbprism.init(properties);
             this.behavior = properties.getIntProperty("behavior", 0);
             this.defaultContentType = properties.getProperty("contenttype", "text/html");
