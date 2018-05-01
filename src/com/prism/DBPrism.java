@@ -48,8 +48,7 @@ public class DBPrism {
     final public static java.lang.String VERSION = "2018-04-20-production";
     final private static java.lang.String CONFIGURATION = "prism.xconf";  // JHK this string should only appear once in this file.
     final public static java.lang.String PROPERTIES = "/" + CONFIGURATION;
-    private DBProcedure proccache = null;
-    private boolean cachep = true;
+    private ProcedureCache procedureCache = null;
     private Configuration properties = null;
 
     /**
@@ -70,12 +69,12 @@ public class DBPrism {
      * @throws Exception
      */
     public Content makePage(HttpServletRequest req, ConnInfo cc_tmp) throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug(".makePage entered.");
-        }
+        log.debug(".makePage entered.");
+
         DBConnection connection = null;
         String name;
         String password;
+        boolean success = false;
         try {
             int i;
             String str;
@@ -121,11 +120,12 @@ public class DBPrism {
                     throw e;
                 }
             }
-            connection.doCall(proccache, req);
+            connection.doCall(procedureCache, req);
             Content pg = connection.getGeneratedStream(req);
             if (log.isDebugEnabled()) {
                 log.debug(".makePage doCall success on " + connection);
             }
+            success = true;
             return pg;
         } catch (Exception e) {
             // try to free the connection
@@ -133,6 +133,12 @@ public class DBPrism {
             // throw the exception as is
             throw e;
         } finally {
+            // if there is a failure, clear the cache
+            //   the reason might be a changed procedure 
+            //   we must get rid of it
+            if (!success) {
+                this.procedureCache.clear();
+            }
             recycle(req, connection);
         }
     }
@@ -248,8 +254,8 @@ public class DBPrism {
             log.debug(".init entered.");
         }
         this.properties = properties;
-        cachep = properties.getBooleanProperty("cacheprocedure", true);
-        proccache = new DBProcedure(cachep);
+        boolean cachep = properties.getBooleanProperty("cacheprocedure", true);
+        procedureCache = new ProcedureCache(cachep);
 
         if (log.isDebugEnabled()) {
             log.debug(".init exited.");

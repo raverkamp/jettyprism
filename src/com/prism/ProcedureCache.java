@@ -16,7 +16,7 @@ import java.util.HashMap;
  * This class stores the Stored Procedures information called to increase
  * performance in the following calls.
  */
-public class DBProcedure {
+public class ProcedureCache {
 
     private boolean shouldCache = false;
 
@@ -25,12 +25,16 @@ public class DBProcedure {
     /**
      * If the parameter is true works as cache
      */
-    public DBProcedure(boolean s) {
+    public ProcedureCache(boolean s) {
         shouldCache = s;
     }
 
+    public synchronized void clear() {
+        this.cache.clear();
+    }
+
     /**
-     * Gets or creates a instance of DBProcedure objects from cache.
+     * Gets or creates a instance of ProcedureCache objects from cache.
      */
     public synchronized SPProc get(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
         SPProc plp = this.cache.get(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname);

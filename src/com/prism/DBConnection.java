@@ -107,7 +107,7 @@ public class DBConnection {
      */
     // LXG: removed exceptions ExecutionErrorPageException and ExecutionErrorMsgException since they are not thrown
     // public void doCall(HttpServletRequest req, String usr, String pass) throws SQLException, NotAuthorizedException, UnsupportedEncodingException, IOException {
-    public void doCall(DBProcedure proccache, HttpServletRequest req) throws
+    public void doCall(ProcedureCache procedureCache, HttpServletRequest req) throws
             SQLException, NotAuthorizedException, UnsupportedEncodingException, IOException,
             ProcedureNotFoundException,
             ExecutionException {
@@ -165,13 +165,13 @@ public class DBConnection {
             UploadRequest multi = new UploadRequest(req, this, this.maxUploadSize);
 
             // Calls the stored procedures with the new request
-            doIt(proccache, multi, getSPCommand(multi));
+            doIt(procedureCache, multi, getSPCommand(multi));
         } else if (command.startsWith(connInfo.flexible_escape_char)) // Calls the stored procedures with the wrapper request
         {
             if (flexibleCompact) {
-                doIt(proccache, new FlexibleRequestCompact(req), command.substring(connInfo.flexible_escape_char.length()));
+                doIt(procedureCache, new FlexibleRequestCompact(req), command.substring(connInfo.flexible_escape_char.length()));
             } else {
-                doIt(proccache, new FlexibleRequest(req), command.substring(connInfo.flexible_escape_char.length()));
+                doIt(procedureCache, new FlexibleRequest(req), command.substring(connInfo.flexible_escape_char.length()));
             }
         } else if (command.startsWith(connInfo.xform_escape_char)) // Calls the stored procedures with the wrapper request
         {
@@ -179,7 +179,7 @@ public class DBConnection {
         } //doIt(new XFormsRequest(req,connInfo), command.substring(1));
         else // Calls the stored procedures with the actual request
         {
-            doIt(proccache, req, command);
+            doIt(procedureCache, req, command);
         }
         if (log.isDebugEnabled()) {
             log.debug(".doCall exited.");
@@ -213,7 +213,7 @@ public class DBConnection {
      * @throws java.sql.SQLException
      * @throws java.io.UnsupportedEncodingException
      */
-    public void doIt(DBProcedure proccache,
+    public void doIt(ProcedureCache procedureCache,
             HttpServletRequest req,
             String servletname) throws SQLException,
             UnsupportedEncodingException,
@@ -260,7 +260,7 @@ public class DBConnection {
         //we will set array variables here
         int foundcount = 0;
         SPProc plp
-                = proccache.get(connInfo, servletname, sqlconn);
+                = procedureCache.get(connInfo, servletname, sqlconn);
         //JHK, to use overloaded get
         // Build procedure call parameter by parameter
         Enumeration real_args = req.getParameterNames();
@@ -413,10 +413,9 @@ public class DBConnection {
             log.info(".doIt command:\n" + command);
         }
         // Exec procedure in DB
-        CallableStatement cs = null;
+
         ArrayList clobPassed = new ArrayList();
-        try {
-            cs = sqlconn.prepareCall(command.toString());
+        try (CallableStatement cs = sqlconn.prepareCall(command.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 if (isClob.get(i)) {
                     CLOB tmpClob
@@ -438,9 +437,6 @@ public class DBConnection {
             throw new ExecutionException("PLSQL Adapter - PLSQL Error\n"
                     + e.getMessage() + MsgArgumentCallError(req));
         } finally {
-            if (cs != null) {
-                cs.close();
-            }
             for (Object clobPassed1 : clobPassed) {
                 CLOB tmpClob = (CLOB) clobPassed1;
                 if (tmpClob != null) {
