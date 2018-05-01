@@ -31,9 +31,7 @@ public class UploadContent {
     private long m_maxFileSize;
     private Vector m_deniedFilesList;
     private Vector m_allowedFilesList;
-    private boolean m_denyPhysicalPath;
-    private boolean m_forcePhysicalPath;
-    private java.lang.String m_contentDisposition;
+
     public static final int SAVE_AUTO = 0;
     public static final int SAVE_VIRTUAL = 1;
     public static final int SAVE_PHYSICAL = 2;
@@ -50,9 +48,6 @@ public class UploadContent {
         m_maxFileSize = 0L;
         m_deniedFilesList = new Vector();
         m_allowedFilesList = new Vector();
-        m_denyPhysicalPath = false;
-        m_forcePhysicalPath = false;
-        m_contentDisposition = new String();
         m_files = new UploadedFiles();
         m_formRequest = new RequestParameters();
     }
@@ -374,18 +369,6 @@ public class UploadContent {
         } else {
             m_allowedFilesList = null;
         }
-    }
-
-    public void setDenyPhysicalPath(boolean deny) {
-        m_denyPhysicalPath = deny;
-    }
-
-    public void setForcePhysicalPath(boolean force) {
-        m_forcePhysicalPath = force;
-    }
-
-    public void setContentDisposition(String contentDisposition) {
-        m_contentDisposition = contentDisposition;
     }
 
     public void setTotalMaxFileSize(long totalMaxFileSize) {

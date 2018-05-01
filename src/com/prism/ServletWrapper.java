@@ -12,22 +12,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-
-import java.sql.SQLException;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;

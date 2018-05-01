@@ -8,10 +8,6 @@
  */
 package com.prism;
 
-import java.sql.SQLException;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import spinat.jettyprism.Configuration;
 

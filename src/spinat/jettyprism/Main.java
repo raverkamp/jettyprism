@@ -62,12 +62,10 @@ public class Main {
         FileReader fr = new FileReader(apf);
         props.load(fr);
         fillPasswords(props);
-        
+
         File dpf = apf.getParentFile();
         msg("setting user.dir to " + dpf.toString());
         System.setProperty("user.dir", dpf.toString());
-
-       
 
         String log4jprops = props.getProperty("log4jconfig", "");
         if (log4jprops.equals("")) {
@@ -225,7 +223,7 @@ public class Main {
                 cons.writer().append("Enter Password for ").append(user).append("@").append(connectStr).append("\n");
                 char[] x = cons.readPassword("pw for %s:", alias);
                 String s = new String(x);
-                props.put("DAD_" + alias +".dbpassword" , s);
+                props.put("DAD_" + alias + ".dbpassword", s);
             }
         }
 

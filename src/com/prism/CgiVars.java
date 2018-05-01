@@ -8,14 +8,9 @@
  */
 package com.prism;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 
 /**

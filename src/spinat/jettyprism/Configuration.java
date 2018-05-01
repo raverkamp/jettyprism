@@ -25,7 +25,7 @@ public class Configuration {
 
     final HashMap<String, Category> categories;
     final HashMap<String, String> general;
-    
+
     public static Configuration loadFromProperties(java.util.Properties props) {
         HashMap<String, Category> cats = new HashMap<>();
         for (String key : props.stringPropertyNames()) {
@@ -45,7 +45,7 @@ public class Configuration {
         }
         return new Configuration(cats, null);
     }
-    
+
     public static Configuration loadFromPropertiesFile(String fileName) throws IOException {
         java.util.Properties props = new java.util.Properties();
         try (InputStream ins = new FileInputStream(fileName)) {
@@ -53,20 +53,19 @@ public class Configuration {
         }
         return loadFromProperties(props);
     }
-    
+
     public static Configuration loadFromPropertiesString(String s) throws IOException {
         StringReader sr = new StringReader(s);
         java.util.Properties props = new java.util.Properties();
         props.load(sr);
         return loadFromProperties(props);
     }
-    
+
     public static String storePropertiesAsString(Properties props) throws IOException {
         StringWriter w = new StringWriter();
-        props.store(w,"");
+        props.store(w, "");
         return w.toString();
     }
-    
 
     private Configuration(HashMap<String, Category> categories,
             HashMap<String, String> variables) {
