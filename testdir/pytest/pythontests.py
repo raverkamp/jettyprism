@@ -32,6 +32,14 @@ def hammer(baseurl, nthread, nrequests):
     for t in l:
         t.join()
 
+def flextest(baseurl):
+    args = {"key1": "val1", "key2": "val2", "key3": "val3"}
+    r = requests.post(baseurl + "!theweb.flex", params=args)
+    r.raise_for_status()
+    res = r.json()
+    if not res == args:
+        raise Exception("flxe result is wrong")
+
 def main():
     parser = argparse.ArgumentParser(description='do some tests')
     parser.add_argument('-port', type=int, default=8888)
@@ -39,6 +47,7 @@ def main():
     args = parser.parse_args()
     baseurl = "http://localhost:{0}/dads/{1}/".format(args.port, args.dad)
     simpletest(baseurl)
-    hammer(baseurl, 5, 1000)
+    flextest(baseurl)
+    (baseurl, 5, 10)
 
 main()

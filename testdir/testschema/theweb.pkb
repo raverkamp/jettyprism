@@ -43,6 +43,8 @@ htp.p('<input type=text name="d">');
 htp.p('<input type="submit">');
 htp.p('</form>');
 
+htp.p('<a href="./!theweb.flex?key1=val1&key2=val2">Flextest</a>');
+
 htp.p('<ul>');
 htp.p('<li>');
 htp.p('<a href="./theweb.gen_excel">Excel </a><br>');
@@ -57,6 +59,7 @@ htp.p('</li>');
 htp.p('<li>');
 htp.p('<a href="./theweb.error">Exception</a>');
 htp.p('</li>');
+htp.p('</ul>');
 htp.p('</div>');
 
 htp.bodyclose;
@@ -266,6 +269,19 @@ end;
 procedure error is
 begin
   raise_application_error(-20000,'exception in procedure');
+end;
+
+procedure flex(name_array owa.vc_arr, value_array owa.vc_arr) is 
+begin
+  owa_util.mime_header('application/json', true, 'utf-8');
+  htp.p('{');
+  for i in name_array.first .. name_array.last loop
+    if i>1 then
+      htp.p(','||chr(10));
+    end if;
+    htp.p('"'||name_array(i)||'": "'||replace(value_array(i),'"','\"')||'"');
+  end loop;
+  htp.p('}');
 end;
 
 end;

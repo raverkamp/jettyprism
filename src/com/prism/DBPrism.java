@@ -288,7 +288,7 @@ public class DBPrism {
         }
         OracleDataSource ds = new OracleDataSource();
         ds.setURL(ci.connectString);
-        ds.setConnectionCachingEnabled(true); 
+        ds.setConnectionCachingEnabled(true);
         datasources.put(ci.connAlias, ds);
         return ds;
 

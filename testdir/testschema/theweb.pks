@@ -23,5 +23,7 @@ procedure tables_demo;
 
 procedure error;
 
+procedure flex(name_array owa.vc_arr, value_array owa.vc_arr);
+
 end;
 /

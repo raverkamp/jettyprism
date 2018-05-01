@@ -73,7 +73,7 @@ public class DBConnection {
     public OracleConnection sqlconn;
     public ConnInfo connInfo;
 
-    private boolean flexibleCompact = false;
+    final private boolean flexibleCompact = true;
 
     protected java.lang.String toolkitVersion;
 
