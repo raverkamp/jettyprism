@@ -1,2 +1,9 @@
+text=auto
+
 *.java text
 *.py text
+*.pks text
+*.pkb text
+*.xml text
+*.properties text
+
