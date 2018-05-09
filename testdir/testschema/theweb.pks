@@ -1,5 +1,6 @@
 create or replace package theweb as
 
+procedure nix;
 
 procedure menu;
 

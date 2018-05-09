@@ -41,12 +41,23 @@ def flextest(baseurl):
     if not res == args:
         raise Exception("flex result is wrong")
 
+def noargtest(baseurl):
+    r = requests.get(baseurl +"theweb.nix")
+    r.raise_for_status()
+    assert(r.text.rstrip() == "nix")
+
+    r = requests.post(baseurl +"theweb.nix")
+    r.raise_for_status()
+    assert(r.text.rstrip() == "nix")
+    
+    
 def main():
     parser = argparse.ArgumentParser(description='do some tests')
     parser.add_argument('-port', type=int, default=8888)
     parser.add_argument('-dad', type=str, default="x")
     args = parser.parse_args()
     baseurl = "http://localhost:{0}/dads/{1}/".format(args.port, args.dad)
+    noargtest(baseurl)
     simpletest(baseurl)
     flextest(baseurl)
     hammer(baseurl, 5, 10)

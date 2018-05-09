@@ -74,6 +74,10 @@ htp.p('<p> Line '||i||'</p>');
 end loop;
 end;
 
+procedure nix is
+begin
+  htp.p('nix');
+end;
 
 procedure test2(a varchar2,b varchar2,c varchar2 default 'x') is
 begin
