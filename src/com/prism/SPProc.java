@@ -120,17 +120,24 @@ public class SPProc {
             plpackage = css.getString(3);
             plprocedure = css.getString(4);
         }
-        String columnNames = "argument_name, overload, data_type, type_owner, type_name, type_subname";
         if (plpackage == null) {
             throw new RuntimeException("procedure must be member of package");
         }
-        try (
-                PreparedStatement cs = sqlconn.prepareStatement("SELECT " + columnNames + " FROM all_arguments WHERE "
-                        + " owner = ? AND package_name = ? AND object_name = ? " + " ORDER BY overload,sequence")) {
+        // in Oracle 11 the a procdure with argumnets its visible in all_arguments
+        // in Oracle 12 this not the case ... strange
+        try (PreparedStatement cs = sqlconn.prepareStatement(
+                "SELECT a.argument_name,a. overload, a.data_type, a.type_owner, a.type_name, a.type_subname \n"
+                + " from all_procedures p \n"
+                + " left join all_arguments a \n"
+                + " on a.owner = p.owner \n"
+                + " and  a.package_name = p.object_name \n"
+                + " and a.subprogram_id = p.subprogram_id \n"
+                + " where p.owner = ? \n"
+                + " and p.object_name = ? \n"
+                + " and p.procedure_name = ? \n"
+                + " order by overload,sequence")) {
             if (log.isDebugEnabled()) {
                 log.debug("Resolving package.procedure call");
-                log.debug("Excuting: SELECT " + columnNames + " FROM all_arguments WHERE "
-                        + " owner = ? AND package_name = ? AND object_name = ? " + " ORDER BY overload,sequence");
                 log.debug("With arg 1: " + owner);
                 log.debug("With arg 2: " + plpackage);
                 log.debug("With arg 3: " + plprocedure);
@@ -139,6 +146,7 @@ public class SPProc {
             cs.setString(2, plpackage);
             cs.setString(3, plprocedure);
             boolean exists = false;
+
             try (ResultSet rs = cs.executeQuery()) {
                 String old_overload = "something";
                 while (rs.next()) {
