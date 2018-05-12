@@ -215,7 +215,7 @@ public class DBConnection {
      */
     public void doIt(ProcedureCache procedureCache,
             HttpServletRequest req,
-            String servletname) throws SQLException,
+            String procedureName) throws SQLException,
             UnsupportedEncodingException,
             ProcedureNotFoundException,
             ExecutionException {
@@ -226,13 +226,13 @@ public class DBConnection {
 
         StringTokenizer st = new StringTokenizer(excludeList, " ");
         if (log.isDebugEnabled()) {
-            log.debug(".doIt - Servlet Name: '" + servletname + "'");
+            log.debug(".doIt - Procedure Name: '" + procedureName + "'");
         }
         // Checks for package that violates exclusion_list parameter
         // Pakckages that start with any of these values are considered with high risk
         while (st.hasMoreElements()) {
             String pkgToExclude = (String) st.nextElement();
-            if (servletname.toLowerCase()
+            if (procedureName.toLowerCase()
                     .startsWith(pkgToExclude.toLowerCase())) {
                 throw new SQLException("Not Authorized");
             }
@@ -250,7 +250,7 @@ public class DBConnection {
         // http://server:port/servlet/plsql/example.print?A=b
         // http://server:port/servlet/plsql/example.print?A=b&c=d
         // Build procedure call
-        StringBuilder command = new StringBuilder(servletname + "(");
+        StringBuilder command = new StringBuilder(procedureName + "(");
         // Main calling command
         StringBuilder decvar = new StringBuilder("DECLARE dummy integer; \n");
         //we will declare array variables here
@@ -260,7 +260,7 @@ public class DBConnection {
         //we will set array variables here
         int foundcount = 0;
         SPProc plp
-                = procedureCache.get(connInfo, servletname, sqlconn);
+                = procedureCache.get(connInfo, procedureName, sqlconn);
         //JHK, to use overloaded get
         // Build procedure call parameter by parameter
         Enumeration real_args = req.getParameterNames();
@@ -284,8 +284,8 @@ public class DBConnection {
             if (argumentType == null) {
                 log
                         .warn("Warning: argument " + name_args + " not in procedure description "
-                                + servletname);
-                throw new SQLException(servletname
+                                + procedureName);
+                throw new SQLException(procedureName
                         + ": MANY PROCEDURES MATCH NAME, BUT NONE MATCHES SIGNATURE (parameter name '"
                         + name_args + "')");
             }
