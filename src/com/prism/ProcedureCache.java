@@ -8,6 +8,7 @@
  */
 package com.prism;
 
+import com.prism.utils.OraUtil.ResolvedProcedure;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -36,12 +37,14 @@ public class ProcedureCache {
     /**
      * Gets or creates a instance of ProcedureCache objects from cache.
      */
-    public synchronized SPProc get(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
-        SPProc plp = this.cache.get(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname);
+    public synchronized SPProc get(ConnInfo conn, ResolvedProcedure rp, Connection sqlconn) 
+            throws SQLException, ProcedureNotFoundException {
+        String hashKey = conn.connAlias + "/" + rp.fullName;
+        SPProc plp = this.cache.get(hashKey);
         if (plp == null) { // plp is not in cache yet
-            plp = new SPProc(conn, procname, sqlconn);
+            plp = new SPProc(conn, rp, sqlconn);
             if (shouldCache) {
-                this.cache.put(conn.connAlias + "." + conn.usr.toLowerCase() + "." + procname, plp);
+                this.cache.put(hashKey, plp);
             }
         }
         return plp;

@@ -16,6 +16,8 @@
  */
 package com.prism;
 
+import com.prism.utils.OraUtil;
+import com.prism.utils.OraUtil.ResolvedProcedure;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -100,29 +102,11 @@ public class SPProc {
      * @return SPProc
      * @throws SQLException
      */
-    public SPProc(ConnInfo conn, String procname, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
+    public SPProc(ConnInfo conn, ResolvedProcedure rp, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
         if (log.isDebugEnabled()) {
-            log.debug(".create overload for: '" + procname + "'");
+            log.debug(".create overload for: '" + rp.fullName + "'");
         }
-        final String owner;
-        final String plpackage;
-        final String plprocedure;
-        try (CallableStatement css = sqlconn.prepareCall("BEGIN \n dbms_utility.name_resolve(?,1,?,?,?,?,?,?); \nEND;")) {
-            css.setString(1, procname);
-            css.registerOutParameter(2, Types.VARCHAR);
-            css.registerOutParameter(3, Types.VARCHAR);
-            css.registerOutParameter(4, Types.VARCHAR);
-            css.registerOutParameter(5, Types.VARCHAR);
-            css.registerOutParameter(6, Types.VARCHAR);
-            css.registerOutParameter(7, Types.VARCHAR);
-            css.execute();
-            owner = css.getString(2);
-            plpackage = css.getString(3);
-            plprocedure = css.getString(4);
-        }
-        if (plpackage == null) {
-            throw new RuntimeException("procedure must be member of package");
-        }
+       
         // in Oracle 11 the a procdure with argumnets its visible in all_arguments
         // in Oracle 12 this not the case ... strange
         try (PreparedStatement cs = sqlconn.prepareStatement(
@@ -138,13 +122,13 @@ public class SPProc {
                 + " order by overload,sequence")) {
             if (log.isDebugEnabled()) {
                 log.debug("Resolving package.procedure call");
-                log.debug("With arg 1: " + owner);
-                log.debug("With arg 2: " + plpackage);
-                log.debug("With arg 3: " + plprocedure);
+                log.debug("With arg 1: " + rp.owner);
+                log.debug("With arg 2: " + rp.package_);
+                log.debug("With arg 3: " + rp.procedure);
             }
-            cs.setString(1, owner);
-            cs.setString(2, plpackage);
-            cs.setString(3, plprocedure);
+            cs.setString(1, rp.owner);
+            cs.setString(2, rp.package_);
+            cs.setString(3, rp.procedure);
             boolean exists = false;
 
             try (ResultSet rs = cs.executeQuery()) {
@@ -188,7 +172,7 @@ public class SPProc {
                     }
                 }
                 if (!exists) {
-                    throw new ProcedureNotFoundException("could not find procedure: " + procname);
+                    throw new ProcedureNotFoundException("could not find procedure: " + rp.fullName);
                 }
             }
         }

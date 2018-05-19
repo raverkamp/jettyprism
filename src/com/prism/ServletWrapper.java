@@ -27,10 +27,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.OracleDriver;
-import oracle.jdbc.pool.OracleDataSource;
-
 import org.apache.log4j.Logger;
 import spinat.jettyprism.Configuration;
 

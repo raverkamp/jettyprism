@@ -55,15 +55,18 @@ static.a.cache-control :
 
 There can be more than one directory for static files.
 
-
-prismconf
-The name of the config file for prims. The default is "prism.xconf".
+port
+the port to listen
 
 use_local
 If this is not falsish (0,N, NO, F, false) then the server will listen only on the
 loopback device (127.0.0.1). Otherwise the server will listen on all IP addresses.
 The default is Y, meaning that it is not possible to access the server from
 other computers.
+
+The properties for the DBprism servlet start with "general." e.g.
+general.alias: x y
+the list of dads (space separated)
 
 
 *** Logging

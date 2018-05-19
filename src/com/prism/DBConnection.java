@@ -22,6 +22,7 @@ import spinat.jettyprism.Configuration;
 
 import com.prism.utils.FlexibleRequest;
 import com.prism.utils.FlexibleRequestCompact;
+import com.prism.utils.OraUtil;
 import java.io.StringReader;
 import java.io.Writer;
 import java.sql.CallableStatement;
@@ -81,7 +82,7 @@ public class DBConnection {
 
     protected java.lang.String nlsTerritory = null;
 
-    protected java.lang.String excludeList;
+    protected java.lang.String includeList;
 
     private final int behavior;
     private final int maxUploadSize;
@@ -108,7 +109,10 @@ public class DBConnection {
     // LXG: removed exceptions ExecutionErrorPageException and ExecutionErrorMsgException since they are not thrown
     // public void doCall(HttpServletRequest req, String usr, String pass) throws SQLException, NotAuthorizedException, UnsupportedEncodingException, IOException {
     public void doCall(ProcedureCache procedureCache, HttpServletRequest req) throws
-            SQLException, NotAuthorizedException, UnsupportedEncodingException, IOException,
+            SQLException,
+            NotAuthorizedException,
+            UnsupportedEncodingException,
+            IOException,
             ProcedureNotFoundException,
             ExecutionException {
         if (log.isDebugEnabled()) {
@@ -192,17 +196,8 @@ public class DBConnection {
      *
      */
     public void resetPackages() throws SQLException {
-        CallableStatement cs;
-        if (log.isDebugEnabled()) {
-            log.debug("Reset session");
-        }
-        cs = sqlconn.prepareCall("BEGIN dbms_session.reset_package; END;");
-        cs.execute();
-        cs.close();
-        //don't wait for garbage collector
-        if (log.isDebugEnabled()) {
-            log
-                    .debug(".resetPackages - 'BEGIN dbms_session.reset_package; END;'");
+        try (CallableStatement cs = sqlconn.prepareCall("BEGIN dbms_session.reset_package; END;")) {
+            cs.execute();
         }
     }
 
@@ -222,21 +217,31 @@ public class DBConnection {
         if (log.isDebugEnabled()) {
             log.debug(".doIt entered.");
         }
-        //  int i;
 
-        StringTokenizer st = new StringTokenizer(excludeList, " ");
-        if (log.isDebugEnabled()) {
-            log.debug(".doIt - Procedure Name: '" + procedureName + "'");
+        final OraUtil.ResolvedProcedure rp = OraUtil.resolveProcedure(sqlconn, procedureName);
+        if (rp ==null) {
+            throw new ProcedureNotFoundException("package/procedure not found: " + procedureName);
         }
-        // Checks for package that violates exclusion_list parameter
-        // Pakckages that start with any of these values are considered with high risk
+        if (rp.package_ == null) {
+            throw new ProcedureNotFoundException("no calling of stand alone procedures");
+        }
+        String realProcedureName = rp.owner + "." + rp.package_ + "." + rp.procedure;
+        String realPackage = rp.owner + "." + rp.package_;
+        StringTokenizer st = new StringTokenizer(includeList, " ");
+        if (log.isDebugEnabled()) {
+            log.debug(".doIt - Real Procedure Name: '" + realProcedureName + "'");
+        }
+        boolean found = false;
         while (st.hasMoreElements()) {
-            String pkgToExclude = (String) st.nextElement();
-            if (procedureName.toLowerCase()
-                    .startsWith(pkgToExclude.toLowerCase())) {
-                throw new SQLException("Not Authorized");
+            if (realPackage.equals(st.nextToken())) {
+                found = true;
+                break;
             }
         }
+        if (!found) {
+            throw new ProcedureNotFoundException("Package not allowed: " + realPackage);
+        }
+
         // parse all FORM input parameters and arrays set as PL/SQL arrays
         // Calling with constants - no prepared calls
         // Handling Case Insensitive args in PL/SQL and owa_image.point
@@ -260,7 +265,7 @@ public class DBConnection {
         //we will set array variables here
         int foundcount = 0;
         SPProc plp
-                = procedureCache.get(connInfo, procedureName, sqlconn);
+                = procedureCache.get(connInfo, rp, sqlconn);
         //JHK, to use overloaded get
         // Build procedure call parameter by parameter
         Enumeration real_args = req.getParameterNames();
@@ -285,7 +290,7 @@ public class DBConnection {
                 log
                         .warn("Warning: argument " + name_args + " not in procedure description "
                                 + procedureName);
-                throw new SQLException(procedureName
+                throw new ProcedureNotFoundException(procedureName
                         + ": MANY PROCEDURES MATCH NAME, BUT NONE MATCHES SIGNATURE (parameter name '"
                         + name_args + "')");
             }
@@ -459,9 +464,13 @@ public class DBConnection {
         this.connInfo = cc;
         this.toolkitVersion
                 = properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
-        this.excludeList
-                = properties.getProperty("exclusion_list", "sys. owa dbms_ htp.",
+        this.includeList
+                = properties.getProperty("allowed_packages", "#",
                         "DAD_" + cc.connAlias);
+        if (this.includeList.equals("#")) {
+            log.error("no allowed_packages property given for DAD " + cc.connAlias + " set property " + "DAD_" + cc.connAlias + ".allowed_packages");
+            throw new Error("no allowed_packages given for DAD " + cc.connAlias);
+        }
         this.behavior = properties.getIntProperty("behavior", 0);
         this.maxUploadSize = properties.getIntProperty("maxUploadSize", 8388608);
         String nlsSetting
