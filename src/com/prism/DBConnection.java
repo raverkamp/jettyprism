@@ -26,6 +26,7 @@ import com.prism.utils.OraUtil;
 import java.io.StringReader;
 import java.io.Writer;
 import java.sql.CallableStatement;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 
@@ -458,10 +459,17 @@ public class DBConnection {
      * Create a concrete DBConnection (DBConnPLSQL). Find extra properties
      * attributes of this connection and return a concrete connection object.
      */
-    public DBConnection(Configuration properties, ConnInfo cc, OracleConnection sqlcon) {
+    public DBConnection(Configuration properties, ConnInfo cc, OracleConnection sqlcon) throws SQLException {
 
         this.sqlconn = sqlcon;
         this.connInfo = cc;
+        String currentSchema = properties.getProperty("current_schema", "", "DAD_" + cc.connAlias);
+        if (!currentSchema.equals("")) {
+            try (Statement stm = this.sqlconn.createStatement()) {
+                stm.execute("alter session set current_schema="+currentSchema);
+            }
+        }
+        
         this.toolkitVersion
                 = properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
         this.includeList

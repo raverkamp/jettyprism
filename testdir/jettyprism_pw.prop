@@ -41,7 +41,10 @@ DAD_x.connectString: jdbc:oracle:thin:@localhost:1521:xe
 DAD_x.dbusername=user_jp
 DAD_x.dbpassword=user_jp
 DAD_x.allowed_packages=USER_JP.THEWEB
+DAD_x.current_schema=
 DAD_y.dynamicLoginRealm: This is Y.
 DAD_y.connectString: jdbc:oracle:thin:@localhost:1521:xe
-DAD_y.dbusername=user_jp
+#DAD_y.dbusername=user_jp
 #DAD_y.dbpassword=user_jp
+DAD_y.allowed_packages=USER_JP.THEWEB
+DAD_y.current_schema=SYS
