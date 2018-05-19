@@ -139,7 +139,7 @@ public class DBPrism {
             if (!success) {
                 this.procedureCache.clear();
             }
-            recycle(req, connection);
+            connection.releasePage();
         }
     }
 
@@ -216,7 +216,7 @@ public class DBPrism {
                 log.debug("DBPrism: doDownload success on " + connection);
             }
         } finally {
-            recycle(req, connection);
+            connection.releasePage();
         }
     }
 
@@ -226,13 +226,6 @@ public class DBPrism {
     public DBPrism() {
         if (log.isDebugEnabled()) {
             log.debug("DBPrism()");
-        }
-    }
-
-    private static void recycle(HttpServletRequest req, DBConnection connection) throws SQLException {
-        // try to free the connection
-        if (connection != null) {
-            connection.releasePage();
         }
     }
 
