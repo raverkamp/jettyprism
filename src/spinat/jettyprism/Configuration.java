@@ -47,10 +47,14 @@ public class Configuration {
     }
 
     public static Configuration loadFromPropertiesFile(String fileName) throws IOException {
-        java.util.Properties props = new java.util.Properties();
         try (InputStream ins = new FileInputStream(fileName)) {
-            props.load(ins);
+            return loadFromStream(ins);
         }
+    }
+
+    public static Configuration loadFromStream(InputStream ins) throws IOException {
+        java.util.Properties props = new java.util.Properties();
+        props.load(ins);
         return loadFromProperties(props);
     }
 

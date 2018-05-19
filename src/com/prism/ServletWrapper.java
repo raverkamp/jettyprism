@@ -60,18 +60,15 @@ public class ServletWrapper extends HttpServlet {
         try {
             String propsString = sc.getInitParameter("properties_string");
             if (propsString != null) {
+                // this is the main method (internal Jetty hosting) branch,
+                // the properties file is read into a string and supplied 
+                //as string in an init parameter
                 this.properties = Configuration.loadFromPropertiesString(propsString);
             } else {
-                String propfilename = sc.getInitParameter("properties");
-                if (propfilename == null) {
-                    String res = sc.getInitParameter("ressource");
-                    if (res == null) {
-                        res = "prism.xconf";
-                    }
-                    URL url = this.getServletContext().getResource("/WEB-INF/" + res);
-                    propfilename = url.toExternalForm().substring("file:".length());
-                }
-                this.properties = Configuration.loadFromPropertiesFile(propfilename);
+                String props = sc.getInitParameter("properties");
+                try (InputStream stream = this.getServletContext().getResourceAsStream("/WEB-INF/" + props)) {
+                    this.properties = Configuration.loadFromStream(stream);
+                };
             }
             log.debug("<<<<<<<<<<<<<<< DBPrism Servlet init >>>>>>>>>>>>>>>");
             log.debug("servlet initialised.");
