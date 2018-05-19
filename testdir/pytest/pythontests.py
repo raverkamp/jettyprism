@@ -48,9 +48,39 @@ def noargtest(baseurl):
 
     r = requests.post(baseurl +"theweb.nix")
     r.raise_for_status()
-    assert(r.text.rstrip() == "nix")
-    
-    
+    assert r.text.rstrip() == "nix"
+
+def exception_test(baseurl):
+    r = requests.get(baseurl +"theweb.error")
+    assert r.status_code == 500
+    for t in ["PLSQL Adapter - PLSQL Error", "ORA-20000: exception in procedure",
+              'ORA-06512: at "USER_JP.THEWEB", line']:
+        assert t in r.text, "Wrong response on exception"
+
+def package_not_found_test(baseurl):
+    r = requests.get(baseurl +"xtheweb.error")
+    assert r.status_code == 500
+    assert "package/procedure not found: xtheweb.error" in r.text, "Wrong response on exception, expecting procedure not found"
+
+def procedure_not_found_test(baseurl):
+    r = requests.get(baseurl +"theweb.nixda")
+    assert r.status_code == 500
+    for t in ["could not find procedure:", "THEWEB.NIXDA"]:
+        assert t in  r.text, "Wrong response on exception, expecting procedure not found"
+
+def procedure_wrong_sig_test(baseurl):
+    r = requests.get(baseurl +"theweb.nix?a=1")
+    assert r.status_code == 500
+    for t in ["theweb.nix", "(parameter name 'a')"]:
+        assert t in  r.text, "Wrong response on exception, expecting parameter wrong"
+
+def procedure_not_allowed(baseurl):
+    r = requests.get(baseurl +"dbms_output.put_line?a=x")
+    assert r.status_code == 500
+    assert "Package not allowed: SYS.DBMS_OUTPUT" in  r.text, \
+        "Wrong response on exception, expecting package not allowed"
+
+
 def main():
     parser = argparse.ArgumentParser(description='do some tests')
     parser.add_argument('-port', type=int, default=8888)
@@ -61,5 +91,10 @@ def main():
     simpletest(baseurl)
     flextest(baseurl)
     hammer(baseurl, 5, 10)
+    exception_test(baseurl)
+    package_not_found_test(baseurl)
+    procedure_not_found_test(baseurl)
+    procedure_wrong_sig_test(baseurl)
+    procedure_not_allowed(baseurl)
 
 main()
