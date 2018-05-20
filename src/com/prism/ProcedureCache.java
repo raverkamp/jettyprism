@@ -9,9 +9,9 @@
 package com.prism;
 
 import com.prism.utils.OraUtil.ResolvedProcedure;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import oracle.jdbc.OracleConnection;
 
 /**
  * This class stores the Stored Procedures information called to increase
@@ -37,7 +37,7 @@ public class ProcedureCache {
     /**
      * Gets or creates a instance of ProcedureCache objects from cache.
      */
-    public synchronized SPProc get(ConnInfo conn, ResolvedProcedure rp, Connection sqlconn) 
+    public synchronized SPProc get(ConnInfo conn, ResolvedProcedure rp, OracleConnection sqlconn) 
             throws SQLException, ProcedureNotFoundException {
         String hashKey = conn.connAlias + "/" + rp.fullName;
         SPProc plp = this.cache.get(hashKey);
