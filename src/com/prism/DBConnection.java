@@ -220,7 +220,7 @@ public class DBConnection {
         }
 
         final OraUtil.ResolvedProcedure rp = OraUtil.resolveProcedure(sqlconn, procedureName);
-        if (rp ==null) {
+        if (rp == null) {
             throw new ProcedureNotFoundException("package/procedure not found: " + procedureName);
         }
         if (rp.package_ == null) {
@@ -316,16 +316,15 @@ public class DBConnection {
                         // Position 2 is args.y value
                         String s
                                 = new String(val_x.getBytes(connInfo.clientCharset));
-                        s = replace2(s);
+
                         setvar.append("dbp$_").append(foundcount)
-                                .append("(1):='").append(s).append("'; ");
+                                .append("(1):='").append(s.replace("'", "''")).append("'; ");
                         if (log.isDebugEnabled()) {
                             log.debug("point " + name_args + ".x=" + val_x);
                         }
                         s = new String(val_y.getBytes(connInfo.clientCharset));
-                        s = replace2(s);
                         setvar.append("dbp$_").append(foundcount)
-                                .append("(2):='").append(s).append("'; ");
+                                .append("(2):='").append(s.replace("'", "''")).append("'; ");
                         if (log.isDebugEnabled()) {
                             log.debug("point " + name_args + ".y=" + val_y);
                         }
@@ -342,9 +341,9 @@ public class DBConnection {
                     }
                     for (int i = 0; i < multi_vals.length; i++) {
                         String s = multi_vals[i];
-                        s = replace2(s);
+
                         setvar.append("dbp$_").append(foundcount).append("(")
-                                .append((i + 1)).append("):='").append(s)
+                                .append((i + 1)).append("):='").append(s.replace("'", "''"))
                                 .append("'; ");
                     }
                     // end for make array variable
@@ -391,7 +390,6 @@ public class DBConnection {
                     isClob.add(true);
                     command.append(name_args).append("=>?,");
                 } else {
-                    s = replace2(s);
                     int slen = s.length();
                     if (slen > 32767) {
                         throw new SQLException("Argument length of '"
@@ -466,10 +464,10 @@ public class DBConnection {
         String currentSchema = properties.getProperty("current_schema", "", "DAD_" + cc.connAlias);
         if (!currentSchema.equals("")) {
             try (Statement stm = this.sqlconn.createStatement()) {
-                stm.execute("alter session set current_schema="+currentSchema);
+                stm.execute("alter session set current_schema=" + currentSchema);
             }
         }
-        
+
         this.toolkitVersion
                 = properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
         this.includeList
@@ -495,22 +493,6 @@ public class DBConnection {
                 log.warn("Incorrect syntax on nls_lang parameter: " + nlsSetting);
             }
         }
-    }
-
-    /**
-     * Replace char '
-     *
-     * @return A new String with the original String without char '
-     * @param s A URL String with char '
-     */
-    public String replace2(String s) {
-        int i = 0;
-        while ((i = s.indexOf('\'', i)) != -1) // "'" char
-        {
-            s = s.substring(0, i + 1) + s.substring(i);
-            i += 2;
-        }
-        return s;
     }
 
     /**
@@ -812,8 +794,6 @@ public class DBConnection {
             connectedUsr = proxyUserName;
         }
         String ppackage = getPackage(req);
-        /* String pprocedure = */
-        getProcedure(req);
 
         resetPackages();
 
@@ -889,65 +869,28 @@ public class DBConnection {
      * @return String
      */
     public String getServletName(HttpServletRequest req) {
-        String servletpath, servletname;
+        final String servletname;
         if (connInfo.alwaysCallDefaultPage) {
             return connInfo.defaultPage;
         }
-        try {
-            if (this.behavior == 0 || this.behavior == 2) {
-                servletpath = replace2(req.getPathInfo());
-            } else {
-                servletpath = replace2(req.getServletPath());
-            }
-            if (log.isDebugEnabled()) {
-                log.debug("servletpath = " + servletpath);
-            }
-            servletname = servletpath.substring(servletpath.lastIndexOf('/') + 1);
-            if (servletname.length() == 0) {
-                servletname = connInfo.defaultPage;
-            }
-            if (log.isDebugEnabled()) {
-                log.debug("servletname = " + servletname);
-                log.debug("servletpath = " + replace2(req.getServletPath()));
-            }
-        } catch (Exception e) {
-            servletname = connInfo.defaultPage;
+        final String tail;
+        if (req.getPathInfo() == null || req.getPathInfo().isEmpty()) {
+            tail = req.getPathInfo();
+        } else {
+            tail = req.getServletPath();
         }
-        return servletname;
-    }
+        if (tail.contains("/")) {
+            servletname = tail.substring(tail.lastIndexOf('/') + 1);
+        } else {
+            servletname = tail;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("servletname = " + servletname);
+            log.debug("servletpath = " + req.getServletPath());
+            log.debug("pathInfo = " + req.getPathInfo());
+        }
 
-    /**
-     * Return the Stored Procedure to call from the URL Ej:
-     * http://server:port/servlet/demo/pkg.sp?arg1=val1&arg2=val2 return sp
-     *
-     * @param req HttpServletRequest
-     * @return String
-     */
-    public String getProcedure(HttpServletRequest req) {
-        String pprocedure;
-        int i;
-        try {
-            String servletname = getServletName(req);
-            if (log.isDebugEnabled()) {
-                log.debug("servletname = " + servletname);
-            }
-            i = servletname.lastIndexOf('.');
-            // Handle anonymous Procedure
-            if (i < 0) {
-                pprocedure = servletname;
-            } else {
-                pprocedure = servletname.substring(i + 1);
-            }
-        } catch (Exception e) {
-            i = connInfo.defaultPage.lastIndexOf('.');
-            // Handle anonymous Procedure
-            if (i < 0) {
-                pprocedure = connInfo.defaultPage;
-            } else {
-                pprocedure = connInfo.defaultPage.substring(i + 1);
-            }
-        }
-        return pprocedure;
+        return servletname;
     }
 
     /**
