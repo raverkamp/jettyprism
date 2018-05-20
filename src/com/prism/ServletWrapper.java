@@ -143,8 +143,9 @@ public class ServletWrapper extends HttpServlet {
             String msg) throws IOException {
         PrintWriter out = res.getWriter();
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        // put your realm here
-        res.setHeader("WWW-authenticate", "basic realm=\"" + msg + "\"");
+        // put your realm here,
+        // set the charset like defined in RFC 7617, we expect UTF-8!
+        res.setHeader("WWW-authenticate", "basic realm=\"" + msg + "\",  charset=\"UTF-8\"");
         out.print(this.UnauthorizedText);
         out.flush();
         if (log.isDebugEnabled()) {

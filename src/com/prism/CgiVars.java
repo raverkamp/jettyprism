@@ -91,7 +91,6 @@ public class CgiVars {
         this.add("DOCUMENT_TABLE", connInfo.documentTable);
         this.add("PLSQL_GATEWAY", DBPrism.NAME);
         this.add("GATEWAY_IVERSION", DBPrism.VERSION);
-        this.add("REQUEST_IANA_CHARSET", connInfo.clientCharset);
 
         Enumeration<String> hn = req.getHeaderNames();
         while (hn.hasMoreElements()) {

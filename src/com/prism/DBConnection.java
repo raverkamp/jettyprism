@@ -137,7 +137,7 @@ public class DBConnection {
         }
         ServletCommand sc = getServletCommand(req);
         String ppackage = sc.package_;
-        
+
         resetPackages();
 
         setCGIVars(req, "", ""); // the empty strings are user/pwd parameter
@@ -310,15 +310,14 @@ public class DBConnection {
                         // the owa_image.point data type is a array of varchar index by binary integer
                         // Position 1 is args.x value
                         // Position 2 is args.y value
-                        String s
-                                = new String(val_x.getBytes(connInfo.clientCharset));
+                        String s = val_x;
 
                         setvar.append("dbp$_").append(foundcount)
                                 .append("(1):='").append(s.replace("'", "''")).append("'; ");
                         if (log.isDebugEnabled()) {
                             log.debug("point " + name_args + ".x=" + val_x);
                         }
-                        s = new String(val_y.getBytes(connInfo.clientCharset));
+                        s = val_y;
                         setvar.append("dbp$_").append(foundcount)
                                 .append("(2):='").append(s.replace("'", "''")).append("'; ");
                         if (log.isDebugEnabled()) {
@@ -787,13 +786,13 @@ public class DBConnection {
         DownloadRequest downloadRequest = new DownloadRequest(req, this);
         downloadRequest.doDownloadFromDB(res);
     }
-    
-     /**
-     * Returns the Servlet command  stringfrom the URL Ej:
+
+    /**
+     * Returns the Servlet command stringfrom the URL Ej:
      * http://server:port/servlet/demo/pkg.sp?arg1=val1&arg2=val2 return pkg.sp
      * i.e. everything in the path before the last /, no query params this can
-     * include the escape char
-     * excluded is the DAD
+     * include the escape char excluded is the DAD
+     *
      * @param req HttpServletRequest
      * @return String
      */
@@ -821,7 +820,6 @@ public class DBConnection {
 
         return cmdString;
     }
-
 
     private static class ServletCommand {
 
@@ -858,7 +856,6 @@ public class DBConnection {
         return new ServletCommand(escapeChar, rest.substring(0, p1), rest.substring(p1 + 1));
     }
 
-
     /**
      * Format the Error Message that will be returned to the browser when an
      * error happens
@@ -868,7 +865,7 @@ public class DBConnection {
      * @throws UnsupportedEncodingException
      */
     public String MsgArgumentCallError(HttpServletRequest req) throws UnsupportedEncodingException {
-        StringBuffer text_error = new StringBuffer();
+        StringBuilder text_error = new StringBuilder();
         text_error.append("\n\n\n While try to execute ").append(getServletCommandString(req));
         text_error.append("\n with args\n");
         Enumeration real_args = req.getParameterNames();
@@ -878,7 +875,7 @@ public class DBConnection {
             if (multi_vals != null && multi_vals.length > 1) { // must be owa_util.ident_array type
                 text_error.append("\n").append(name_args).append(":");
                 for (int i = 0; i < multi_vals.length; i++) {
-                    text_error.append("\n\t").append(new String(multi_vals[i].getBytes(connInfo.clientCharset)));
+                    text_error.append("\n\t").append(multi_vals[i]);
                 }
             } else if (name_args.indexOf('.') > 0) {
                 // image point data type

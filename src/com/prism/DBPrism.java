@@ -9,6 +9,8 @@
 package com.prism;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,7 +84,7 @@ public class DBPrism {
                 log.debug("Auto " + req.getHeader("Authorization"));
                 String s = req.getHeader("Authorization").substring(6);
                 byte[] bytes = DatatypeConverter.parseBase64Binary(s);
-                str = new String(bytes, cc_tmp.clientCharset);
+                str = new String(bytes,   StandardCharsets.UTF_8);
                 log.debug("ist: " + str);
             } catch (Exception e) {
                 str = ":";
@@ -178,7 +180,7 @@ public class DBPrism {
 
                 String s = req.getHeader("Authorization").substring(6);
                 byte[] bytes = DatatypeConverter.parseBase64Binary(s);
-                str = new String(bytes, cc_tmp.clientCharset);
+                str = new String(bytes, StandardCharsets.UTF_8);
             } catch (Exception e) {
                 str = ":";
             }

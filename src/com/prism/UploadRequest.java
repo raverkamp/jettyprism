@@ -27,6 +27,7 @@ import javax.servlet.http.HttpSession;
 import com.prism.utils.RequestParameters;
 import com.prism.utils.UploadContent;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequestWrapper;
 import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.OracleResultSet;
@@ -528,7 +529,8 @@ public final class UploadRequest extends HttpServletRequestWrapper {
                         ps.setString(2, upload.getFiles().getFile(u).getTypeMIME() + "/"
                                 + upload.getFiles().getFile(u).getSubTypeMIME());
                         ps.setInt(3, upload.getFiles().getFile(u).getSize());
-                        ps.setString(4, conn.connInfo.clientCharset);
+                        // Roland Averkamp, this whole upload/download stuff is a mess
+                        ps.setString(4, StandardCharsets.UTF_8.toString());
                         ps.setDate(5, new java.sql.Date(System.currentTimeMillis()));
                         ps.execute();
                         ps.close();
@@ -563,7 +565,7 @@ public final class UploadRequest extends HttpServletRequestWrapper {
                 String name = (String) p_names.nextElement();
                 String vals[] = upload.getRequest().getParameterValues(name);
                 for (int i = 0; i < vals.length; i++) {
-                    String val = new String(vals[i].getBytes(conn.connInfo.clientCharset));
+                    String val = vals[i];
                     setParameter(name, val);
                 }
             }

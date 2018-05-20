@@ -51,9 +51,6 @@ public class ConnInfo {
     public boolean alwaysCallDefaultPage;
     public java.lang.String customAuthentication;
     public boolean proxyUser;
-    public java.lang.String clientCharset = "iso-8859-1";
-    //public java.lang.String dbCharset = "iso-8859-1";
-
     public int status = CONN_FREE;
     // owa_public.owa_util.ident_arr information for 7x support
     public java.lang.String type_owner;
@@ -134,8 +131,6 @@ public class ConnInfo {
             log.debug("useProxyUser:          " + proxyUser);
         }
 
-        clientCharset
-                = properties.getProperty("clientcharset", "iso-8859-1", "DAD_" + aliasdef);
         type_owner
                 = properties.getProperty("type_owner", "OWA_PUBLIC", "DAD_" + aliasdef);
         type_name
