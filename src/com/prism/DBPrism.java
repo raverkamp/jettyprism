@@ -140,7 +140,7 @@ public class DBPrism {
                 this.procedureCache.clear();
             }
             if (connection != null) {
-              connection.releasePage();
+                connection.releasePage();
             }
         }
     }

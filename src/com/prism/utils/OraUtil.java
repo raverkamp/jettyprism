@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import oracle.jdbc.OracleConnection;
 
-
 public class OraUtil {
 
     public static class ResolvedProcedure {
@@ -27,7 +26,7 @@ public class OraUtil {
                 this.fullName = this.owner + "." + this.package_ + "." + this.procedure;
             }
         }
-        
+
     }
 
     public static ResolvedProcedure resolveProcedure(OracleConnection sqlconn, String procname) throws SQLException {
@@ -40,8 +39,8 @@ public class OraUtil {
             css.registerOutParameter(6, Types.VARCHAR);
             css.registerOutParameter(7, Types.VARCHAR);
             try {
-            css.execute();
-            } catch(SQLException e) {
+                css.execute();
+            } catch (SQLException e) {
 
                 if (e.getErrorCode() == 6564) {
                     return null;

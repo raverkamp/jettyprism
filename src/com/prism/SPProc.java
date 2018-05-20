@@ -89,7 +89,7 @@ public class SPProc {
         if (log.isDebugEnabled()) {
             log.debug(".create overload for: '" + rp.fullName + "'");
         }
-       
+
         // in Oracle 11 the a procdure with argumnets its visible in all_arguments
         // in Oracle 12 this not the case ... strange
         try (PreparedStatement cs = sqlconn.prepareStatement(

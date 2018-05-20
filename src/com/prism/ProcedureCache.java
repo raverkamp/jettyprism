@@ -37,7 +37,7 @@ public class ProcedureCache {
     /**
      * Gets or creates a instance of ProcedureCache objects from cache.
      */
-    public synchronized SPProc get(ConnInfo conn, ResolvedProcedure rp, OracleConnection sqlconn) 
+    public synchronized SPProc get(ConnInfo conn, ResolvedProcedure rp, OracleConnection sqlconn)
             throws SQLException, ProcedureNotFoundException {
         String hashKey = conn.connAlias + "/" + rp.fullName;
         SPProc plp = this.cache.get(hashKey);
