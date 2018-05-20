@@ -135,17 +135,12 @@ public class DBConnection {
             log.debug(".doCall - Proxy user: " + proxyUserName);
             //connectedUsr = proxyUserName;
         }
-        String ppackage = getPackage(req);
-        // LXG: removed - unused.
-        // String pprocedure = getProcedure(req);
-        String command = getSPCommand(req);
-        if (log.isDebugEnabled()) {
-            log.debug("SP command: " + command);
-        }
-
+        ServletCommand sc = getServletCommand(req);
+        String ppackage = sc.package_;
+        
         resetPackages();
 
-        setCGIVars(req, "", "");
+        setCGIVars(req, "", ""); // the empty strings are user/pwd parameter
         int authStatus = doAuthorize(connInfo.customAuthentication, ppackage);
         if (authStatus != 1) {
             String realms = getRealm();
@@ -170,21 +165,22 @@ public class DBConnection {
             UploadRequest multi = new UploadRequest(req, this, this.maxUploadSize);
 
             // Calls the stored procedures with the new request
-            doIt(procedureCache, multi, getSPCommand(multi));
-        } else if (command.startsWith(connInfo.flexible_escape_char)) // Calls the stored procedures with the wrapper request
+            doIt(procedureCache, multi, sc.package_ + "." + sc.procedure);
+        } else if (sc.escapeChar.equals(connInfo.flexible_escape_char)) // Calls the stored procedures with the wrapper request
         {
             if (flexibleCompact) {
-                doIt(procedureCache, new FlexibleRequestCompact(req), command.substring(connInfo.flexible_escape_char.length()));
+                doIt(procedureCache, new FlexibleRequestCompact(req), sc.package_ + "." + sc.procedure);
             } else {
-                doIt(procedureCache, new FlexibleRequest(req), command.substring(connInfo.flexible_escape_char.length()));
+                doIt(procedureCache, new FlexibleRequest(req), sc.package_ + "." + sc.procedure);
             }
-        } else if (command.startsWith(connInfo.xform_escape_char)) // Calls the stored procedures with the wrapper request
+        } else if (sc.escapeChar.equals(connInfo.xform_escape_char)) // Calls the stored procedures with the wrapper request
         {
             throw new RuntimeException("not implemented: XFormsRequest");
-        } //doIt(new XFormsRequest(req,connInfo), command.substring(1));
-        else // Calls the stored procedures with the actual request
+        } else if (sc.escapeChar != null && !sc.escapeChar.isEmpty()) {
+            throw new RuntimeException("unknown escape char: " + sc.escapeChar);
+        } else // Calls the stored procedures with the actual request
         {
-            doIt(procedureCache, req, command);
+            doIt(procedureCache, req, sc.package_ + "." + sc.procedure);
         }
         if (log.isDebugEnabled()) {
             log.debug(".doCall exited.");
@@ -496,21 +492,6 @@ public class DBConnection {
     }
 
     /**
-     * Replace char spaces
-     *
-     * @return A new String with the original String without char '
-     * @param s A URL String with char '
-     */
-    public String replace3(String s) {
-        int i = 0;
-        while ((i = s.indexOf(' ', i)) != -1) // " " char
-        {
-            s = s.substring(0, i) + s.substring(i + 1);
-        }
-        return s;
-    }
-
-    /**
      * Concrete operation of Template Method pattern. Pass CGI Enviroment to the
      * DB
      */
@@ -772,7 +753,7 @@ public class DBConnection {
      */
     // LXG: removed ExecutionErrorPageException and ExecutionErrorMsgException since they are not thrown
     // public void doDownload(HttpServletRequest req, HttpServletResponse res, String usr, String pass) throws SQLException, NotAuthorizedException, ExecutionErrorPageException, ExecutionErrorMsgException, UnsupportedEncodingException, IOException {
-    public void doDownload(HttpServletRequest req, HttpServletResponse res, String usr, String pass) throws SQLException, NotAuthorizedException, UnsupportedEncodingException, IOException {
+    public void doDownload(HttpServletRequest req, HttpServletResponse res, String usr, String pass) throws SQLException, NotAuthorizedException, UnsupportedEncodingException, IOException, ProcedureNotFoundException {
         if (log.isDebugEnabled()) {
             log.debug(".doDownload entered.");
         }
@@ -793,7 +774,7 @@ public class DBConnection {
             log.debug(".doDownload - Proxy user: " + proxyUserName);
             connectedUsr = proxyUserName;
         }
-        String ppackage = getPackage(req);
+        String ppackage = getServletCommand(req).package_;
 
         resetPackages();
 
@@ -806,92 +787,77 @@ public class DBConnection {
         DownloadRequest downloadRequest = new DownloadRequest(req, this);
         downloadRequest.doDownloadFromDB(res);
     }
-
-    /**
-     * Returns a Stored Procedure to call from the URL Eg:
+    
+     /**
+     * Returns the Servlet command  stringfrom the URL Ej:
      * http://server:port/servlet/demo/pkg.sp?arg1=val1&arg2=val2 return pkg.sp
-     *
+     * i.e. everything in the path before the last /, no query params this can
+     * include the escape char
+     * excluded is the DAD
      * @param req HttpServletRequest
      * @return String
      */
-    public String getSPCommand(HttpServletRequest req) {
-        // removes blank spaces because Oracle's dbms_utility.name_resolve
-        // will ignore it and them the security system for exlcusion_list do not work
-        return replace3(getServletName(req));
-    }
-
-    /**
-     * Returns a Package name from the URL Eg:
-     * http://server:port/servlet/demo/pkg.sp?arg1=val1&arg2=val2 return pkg
-     *
-     * @param req HttpServletRequest
-     * @return String
-     */
-    public String getPackage(HttpServletRequest req) {
-        String ppackage;
-        int i;
-        try {
-            String servletname = getServletName(req);
-            if (log.isDebugEnabled()) {
-                log.debug("servletname = " + servletname);
-            }
-            i = servletname.lastIndexOf('.');
-            // Handle anonymous Procedure
-            if (i < 0) {
-                ppackage = "";
-            } else {
-                ppackage = servletname.substring(0, i);
-            }
-        } catch (Exception e) {
-            i = connInfo.defaultPage.lastIndexOf('.');
-            // Handle anonymous Procedure
-            if (i < 0) {
-                ppackage = "";
-            } else {
-                ppackage = connInfo.defaultPage.substring(0, i);
-            }
-        }
-        // check for flexible request and xforms request
-        if (ppackage.startsWith(connInfo.flexible_escape_char)) {
-            return ppackage.substring(connInfo.flexible_escape_char.length());
-        } else if (ppackage.startsWith(connInfo.xform_escape_char)) {
-            return ppackage.substring(connInfo.xform_escape_char.length());
-        } else {
-            return ppackage;
-        }
-    }
-
-    /**
-     * Returns the Servlet name from the URL Ej:
-     * http://server:port/servlet/demo/pkg.sp?arg1=val1&arg2=val2 return pkg.sp
-     *
-     * @param req HttpServletRequest
-     * @return String
-     */
-    public String getServletName(HttpServletRequest req) {
-        final String servletname;
+    private String getServletCommandString(HttpServletRequest req) {
+        final String cmdString;
         if (connInfo.alwaysCallDefaultPage) {
             return connInfo.defaultPage;
         }
         final String tail;
         if (req.getPathInfo() == null || req.getPathInfo().isEmpty()) {
-            tail = req.getPathInfo();
-        } else {
             tail = req.getServletPath();
+        } else {
+            tail = req.getPathInfo();
         }
         if (tail.contains("/")) {
-            servletname = tail.substring(tail.lastIndexOf('/') + 1);
+            cmdString = tail.substring(tail.lastIndexOf('/') + 1);
         } else {
-            servletname = tail;
+            cmdString = tail;
         }
         if (log.isDebugEnabled()) {
-            log.debug("servletname = " + servletname);
+            log.debug("servletname = " + cmdString);
             log.debug("servletpath = " + req.getServletPath());
             log.debug("pathInfo = " + req.getPathInfo());
         }
 
-        return servletname;
+        return cmdString;
     }
+
+
+    private static class ServletCommand {
+
+        public final String package_;
+        public final String procedure;
+        public final String escapeChar;
+
+        public ServletCommand(String escapeChar, String package_, String procedure) {
+            this.escapeChar = escapeChar;
+            this.package_ = package_;
+            this.procedure = procedure;
+        }
+    }
+
+    private ServletCommand getServletCommand(HttpServletRequest req) throws ProcedureNotFoundException {
+        String s = getServletCommandString(req);
+        if (s.length() < 3) {
+            throw new ProcedureNotFoundException("this is not a procedure: " + s);
+        }
+        final String escapeChar;
+        final String rest;
+        if (!(Character.isAlphabetic(s.charAt(0)) || Character.isDigit(s.charAt(0)))) {
+            escapeChar = s.substring(0, 1);
+            rest = s.substring(1);
+        } else {
+            escapeChar = "";
+            rest = s;
+        }
+
+        int p1 = rest.lastIndexOf('.');
+        if (p1 < 0 || p1 != rest.indexOf('.')) {
+            throw new ProcedureNotFoundException("this is not a procedure: " + s);
+        }
+        return new ServletCommand(escapeChar, rest.substring(0, p1), rest.substring(p1 + 1));
+    }
+
 
     /**
      * Format the Error Message that will be returned to the browser when an
@@ -903,7 +869,7 @@ public class DBConnection {
      */
     public String MsgArgumentCallError(HttpServletRequest req) throws UnsupportedEncodingException {
         StringBuffer text_error = new StringBuffer();
-        text_error.append("\n\n\n While try to execute ").append(getServletName(req));
+        text_error.append("\n\n\n While try to execute ").append(getServletCommandString(req));
         text_error.append("\n with args\n");
         Enumeration real_args = req.getParameterNames();
         while (real_args.hasMoreElements()) {
