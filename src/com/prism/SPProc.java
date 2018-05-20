@@ -17,15 +17,13 @@
 package com.prism;
 
 import com.prism.utils.OraUtil;
-import com.prism.utils.OraUtil.ResolvedProcedure;
-import java.sql.CallableStatement;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import oracle.jdbc.OracleConnection;
 
 import org.apache.log4j.Logger;
 
@@ -43,21 +41,6 @@ public class SPProc {
     public void addProcedure(String index) {
         procedures.put(index, new HashMap());
         arguments.put(index, new ArrayList());
-    }
-
-    /**
-     * add a new argument name for this procedure definition for every
-     * overloaded procedure entry there are entrys for each argument name
-     */
-    public void add(String overloadIndex, String argumentName, String argumentType) {
-        HashMap procedure = procedures.get(overloadIndex);
-        ArrayList args = arguments.get(overloadIndex);
-        procedure.put(argumentName, argumentType);
-        args.add(argumentName);
-        if (log.isDebugEnabled()) //JHK
-        {
-            log.debug("into : " + overloadIndex + " arg_name: " + argumentName + " inserted with type: " + argumentType);
-        }
     }
 
     /**
@@ -102,7 +85,7 @@ public class SPProc {
      * @return SPProc
      * @throws SQLException
      */
-    public SPProc(ConnInfo conn, ResolvedProcedure rp, Connection sqlconn) throws SQLException, ProcedureNotFoundException {
+    public SPProc(ConnInfo conn, OraUtil.ResolvedProcedure rp, OracleConnection sqlconn) throws SQLException, ProcedureNotFoundException {
         if (log.isDebugEnabled()) {
             log.debug(".create overload for: '" + rp.fullName + "'");
         }
