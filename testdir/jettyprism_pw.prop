@@ -15,27 +15,13 @@ only_local=1
 port=8888
 
 # the jetty prism config
-general.clientcharset: iso-8859-1
-general.InitialLimit: 0
-general.MaxStatementsLimit: 0
 general.cacheprocedure: true
-general.MaxLimit: 3
-general.ValidateConnection: false
-general.contenttype: text/html; charset=iso-8859-1
 general.errorLevel: 0
 general.UnauthorizedText: You must be enter DB username and password to access at the system
 general.errorPage: /404.html
-general.LoginTimeout: 10
-general.MinLimit: 0
 general.flexibleRequest: compact
 general.alias: x y
-general.dynamicLoginRealm: new DB Login
 general.behavior: 2
-general.CacheScheme: FixedWait
-general.connectString: ${demo.db}
-Manager.maxconnections: 20
-Manager.timeout: 600
-Manager.minconnections: 0
 DAD_x.dynamicLoginRealm: This is X.
 DAD_x.connectString: jdbc:oracle:thin:@localhost:1521:xe
 DAD_x.dbusername=user_jp

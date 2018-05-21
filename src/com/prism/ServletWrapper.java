@@ -46,7 +46,6 @@ public class ServletWrapper extends HttpServlet {
     private DBPrism dbprism = null;
     private Configuration properties;
     private int behavior;
-    private java.lang.String defaultContentType = "text/html";
     private java.lang.String UnauthorizedText;
 
     public ServletWrapper() {
@@ -76,7 +75,6 @@ public class ServletWrapper extends HttpServlet {
             this.dbprism = new DBPrism();
             this.dbprism.init(properties);
             this.behavior = properties.getIntProperty("behavior", 0);
-            this.defaultContentType = properties.getProperty("contenttype", "text/html");
             this.UnauthorizedText = properties.getProperty("UnauthorizedText",
                     "You must be enter DB username and password to access at the system");
         } catch (IOException e) {
@@ -175,7 +173,7 @@ public class ServletWrapper extends HttpServlet {
         if (log.isDebugEnabled()) {
             log.debug(".sendFailureMsg generated error page " + reason);
         }
-        res.setContentType(this.defaultContentType);
+        res.setContentType("text/html");
         res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         out.println("<html><head></head><body BGCOLOR=\"#ffffff\">");
         out.println("<h3>Servlet Wrapper Error Page</h3><pre>");
@@ -362,7 +360,7 @@ public class ServletWrapper extends HttpServlet {
             } while ((s = in.readLine()) != null && s.length() > 0);
             // End while header lines
             if (!contentType) {
-                res.setContentType(this.defaultContentType);
+                res.setContentType("text/html");
             }
             // this is new in DBPrism 2.1.1 (support for HTMLDB 2.0 inline download functionality
             InputStream is = page.getInputStream();
@@ -399,7 +397,7 @@ public class ServletWrapper extends HttpServlet {
         } else {
             // if not header syntax, print it as is
             // Set default Content-type
-            res.setContentType(this.defaultContentType);
+            res.setContentType("text/html");
             // Get the writer
             PrintWriter out = null;
             out = res.getWriter();
