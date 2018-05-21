@@ -47,9 +47,7 @@ public class DBPrism {
 
     final private static Logger log = Logger.getLogger(DBPrism.class);
     final public static java.lang.String NAME = "DBPrism";
-    final public static java.lang.String VERSION = "2018-04-20-production";
-    final private static java.lang.String CONFIGURATION = "prism.xconf";  // JHK this string should only appear once in this file.
-    final public static java.lang.String PROPERTIES = "/" + CONFIGURATION;
+    final public static java.lang.String VERSION = "2018-05-21-production";
     private ProcedureCache procedureCache = null;
     private Configuration properties = null;
 

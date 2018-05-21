@@ -85,7 +85,6 @@ public class DBConnection {
 
     protected java.lang.String includeList;
 
-    private final int behavior;
     private final int maxUploadSize;
 
     static final int MAX_PL_LINES = 127;
@@ -472,7 +471,6 @@ public class DBConnection {
             log.error("no allowed_packages property given for DAD " + cc.connAlias + " set property " + "DAD_" + cc.connAlias + ".allowed_packages");
             throw new Error("no allowed_packages given for DAD " + cc.connAlias);
         }
-        this.behavior = properties.getIntProperty("behavior", 0);
         this.maxUploadSize = properties.getIntProperty("maxUploadSize", 8388608);
         String nlsSetting
                 = properties.getProperty("nls_lang", null, "DAD_" + cc.connAlias);
