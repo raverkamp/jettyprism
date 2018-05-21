@@ -44,7 +44,7 @@ public class ServletWrapper extends HttpServlet {
 
     private static Logger log = Logger.getLogger(ServletWrapper.class);
     private DBPrism dbprism = null;
-    private Configuration properties;
+    private Configuration config;
     private int behavior;
     private java.lang.String UnauthorizedText;
 
@@ -60,22 +60,22 @@ public class ServletWrapper extends HttpServlet {
             String propsString = sc.getInitParameter("properties_string");
             if (propsString != null) {
                 // this is the main method (internal Jetty hosting) branch,
-                // the properties file is read into a string and supplied 
+                // the config file is read into a string and supplied 
                 //as string in an init parameter
-                this.properties = Configuration.loadFromPropertiesString(propsString);
+                this.config = Configuration.loadFromPropertiesString(propsString);
             } else {
                 String props = sc.getInitParameter("properties");
                 try (InputStream stream = this.getServletContext().getResourceAsStream("/WEB-INF/" + props)) {
-                    this.properties = Configuration.loadFromStream(stream);
+                    this.config = Configuration.loadFromStream(stream);
                 };
             }
             log.debug("<<<<<<<<<<<<<<< DBPrism Servlet init >>>>>>>>>>>>>>>");
             log.debug("servlet initialised.");
             // LXG: now intialise DBPrism
             this.dbprism = new DBPrism();
-            this.dbprism.init(properties);
-            this.behavior = properties.getIntProperty("behavior", 0);
-            this.UnauthorizedText = properties.getProperty("UnauthorizedText",
+            this.dbprism.init(config);
+            this.behavior = config.getIntProperty("behavior", 0);
+            this.UnauthorizedText = config.getProperty("UnauthorizedText",
                     "You must be enter DB username and password to access at the system");
         } catch (IOException e) {
             log.error("Error Loading " + sc.getInitParameter("properties"), e);
@@ -93,7 +93,7 @@ public class ServletWrapper extends HttpServlet {
         String errorPage = "/error.html";
         String alias = getAliasFromURI(req);
         try {
-            ConnInfo cc_tmp = new ConnInfo(this.properties, alias);
+            ConnInfo cc_tmp = new ConnInfo(this.config, alias);
             Content r = this.dbprism.makePage(req, cc_tmp);
             showPage(req, res, r);
 

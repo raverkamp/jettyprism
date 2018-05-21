@@ -49,7 +49,7 @@ public class DBPrism {
     final public static java.lang.String NAME = "DBPrism";
     final public static java.lang.String VERSION = "2018-05-21-production";
     private ProcedureCache procedureCache = null;
-    private Configuration properties = null;
+    private Configuration config = null;
 
     /**
      * private connection which hold the connection betwen makePage and getPage
@@ -231,12 +231,12 @@ public class DBPrism {
         }
     }
 
-    public void init(Configuration properties) throws IOException {
+    public void init(Configuration config) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(".init entered.");
         }
-        this.properties = properties;
-        boolean cachep = properties.getBooleanProperty("cacheprocedure", true);
+        this.config = config;
+        boolean cachep = config.getBooleanProperty("cacheprocedure", true);
         procedureCache = new ProcedureCache(cachep);
 
         if (log.isDebugEnabled()) {
@@ -280,6 +280,6 @@ public class DBPrism {
         OracleDataSource ds = getDataSource(ci);
         OracleConnection con = (OracleConnection) ds.getConnection(user, pw);
         con.setAutoCommit(false);
-        return new DBConnection(this.properties, ci, con);
+        return new DBConnection(this.config, ci, con);
     }
 }

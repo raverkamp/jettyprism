@@ -61,53 +61,53 @@ public class ConnInfo {
      * This method makes a ConnInfo objects through the aliasdef Connection
      * alias is retrieved from the URL information Example: plsql => the URL
      * http://server:port/servlet/plsql/xx.yy?arg=val Example: www_dba => the
-     * URL http://server:port/servlet/www_dba/xx.yy?arg=val The aliasdef works
-     * with multiples zones definition in servlet properties The servlet zones
-     * args must be pointed to the same prism.properties and Prism.jar See
-     * servlet.properties for more details Params: global.alias=plsql xml demo
-     * servlet xmld This method retrieves the factory that has to be created
-     * (the database to be used) from the properties file (prism.properties)
+ URL http://server:port/servlet/www_dba/xx.yy?arg=val The aliasdef works
+ with multiples zones definition in servlet config The servlet zones
+ args must be pointed to the same prism.config and Prism.jar See
+ servlet.config for more details Params: global.alias=plsql xml demo
+ servlet xmld This method retrieves the factory that has to be created
+ (the database to be used) from the config file (prism.config)
      *
      * @param aliasdef String
      * @throws Exception
      */
-    public ConnInfo(Configuration properties, String aliasdef) {
+    public ConnInfo(Configuration config, String aliasdef) {
         //JHK who are we initializing
         if (log.isDebugEnabled()) {
             log.debug("Initializing connection: " + aliasdef);
         }
         connAlias = aliasdef;
         usr
-                = properties.getProperty("dbusername", "", "DAD_" + aliasdef);
+                = config.getProperty("dbusername", "", "DAD_" + aliasdef);
         pass
-                = properties.getProperty("dbpassword", "", "DAD_" + aliasdef);
+                = config.getProperty("dbpassword", "", "DAD_" + aliasdef);
         errorPage
-                = properties.getProperty("errorPage", "/404.html", "DAD_" + aliasdef);
+                = config.getProperty("errorPage", "/404.html", "DAD_" + aliasdef);
         dynamicLoginRealm
-                = properties.getProperty("dynamicLoginRealm", aliasdef, "DAD_" + aliasdef);
+                = config.getProperty("dynamicLoginRealm", aliasdef, "DAD_" + aliasdef);
         documentTable
-                = properties.getProperty("documentTable", "owa_public.wpg_document", "DAD_" + aliasdef);
+                = config.getProperty("documentTable", "owa_public.wpg_document", "DAD_" + aliasdef);
         docAccessPath
-                = properties.getProperty("docAccessPath", "docs", "DAD_" + aliasdef);
+                = config.getProperty("docAccessPath", "docs", "DAD_" + aliasdef);
         docAccessProcedure
-                = properties.getProperty("docAccessProcedure", "owa_public.wpg_testdoc.process_download", "DAD_" + aliasdef);
+                = config.getProperty("docAccessProcedure", "owa_public.wpg_testdoc.process_download", "DAD_" + aliasdef);
         defaultPage
-                = properties.getProperty("defaultPage", "wwwIndex.html", "DAD_" + aliasdef);
+                = config.getProperty("defaultPage", "wwwIndex.html", "DAD_" + aliasdef);
         alwaysCallDefaultPage
-                = properties.getBooleanProperty("alwaysCallDefaultPage", false, "DAD_" + aliasdef);
+                = config.getBooleanProperty("alwaysCallDefaultPage", false, "DAD_" + aliasdef);
         customAuthentication
-                = properties.getProperty("customAuthentication", "none", "DAD_" + aliasdef);
+                = config.getProperty("customAuthentication", "none", "DAD_" + aliasdef);
         connectString
-                = properties.getProperty("connectString", "****no_connect_string***", "DAD_" + aliasdef); //JHK
+                = config.getProperty("connectString", "****no_connect_string***", "DAD_" + aliasdef); //JHK
         errorLevel
-                = properties.getIntProperty("errorLevel", 0, "DAD_" + aliasdef);
+                = config.getIntProperty("errorLevel", 0, "DAD_" + aliasdef);
         flexible_escape_char
-                = properties.getProperty("flexibleEscapeChar", "!", "DAD_" + aliasdef);
+                = config.getProperty("flexibleEscapeChar", "!", "DAD_" + aliasdef);
         xform_escape_char
-                = properties.getProperty("xformEscapeChar", "^", "DAD_" + aliasdef);
+                = config.getProperty("xformEscapeChar", "^", "DAD_" + aliasdef);
         xform_param_name
-                = properties.getProperty("xformParamName", "post_xml", "DAD_" + aliasdef);
-        proxyUser = properties.getBooleanProperty("useProxyUser", false, "DAD_" + aliasdef);
+                = config.getProperty("xformParamName", "post_xml", "DAD_" + aliasdef);
+        proxyUser = config.getBooleanProperty("useProxyUser", false, "DAD_" + aliasdef);
         if (log.isDebugEnabled()) {
             log.debug("User: " + usr);
             log.debug("pass:                  " + pass);
@@ -128,10 +128,10 @@ public class ConnInfo {
         }
 
         type_owner
-                = properties.getProperty("type_owner", "OWA_PUBLIC", "DAD_" + aliasdef);
+                = config.getProperty("type_owner", "OWA_PUBLIC", "DAD_" + aliasdef);
         type_name
-                = properties.getProperty("type_name", "OWA_UTIL", "DAD_" + aliasdef);
+                = config.getProperty("type_name", "OWA_UTIL", "DAD_" + aliasdef);
         type_subname
-                = properties.getProperty("type_subname", "IDENT_ARR", "DAD_" + aliasdef);
+                = config.getProperty("type_subname", "IDENT_ARR", "DAD_" + aliasdef);
     }
 }

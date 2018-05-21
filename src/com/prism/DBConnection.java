@@ -448,14 +448,14 @@ public class DBConnection {
     }
 
     /**
-     * Create a concrete DBConnection (DBConnPLSQL). Find extra properties
-     * attributes of this connection and return a concrete connection object.
+     * Create a concrete DBConnection (DBConnPLSQL). Find extra config
+ attributes of this connection and return a concrete connection object.
      */
-    public DBConnection(Configuration properties, ConnInfo cc, OracleConnection sqlcon) throws SQLException {
+    public DBConnection(Configuration config, ConnInfo cc, OracleConnection sqlcon) throws SQLException {
 
         this.sqlconn = sqlcon;
         this.connInfo = cc;
-        String currentSchema = properties.getProperty("current_schema", "", "DAD_" + cc.connAlias);
+        String currentSchema = config.getProperty("current_schema", "", "DAD_" + cc.connAlias);
         if (!currentSchema.equals("")) {
             try (Statement stm = this.sqlconn.createStatement()) {
                 stm.execute("alter session set current_schema=" + currentSchema);
@@ -463,17 +463,17 @@ public class DBConnection {
         }
 
         this.toolkitVersion
-                = properties.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
+                = config.getProperty("toolkit", "4x", "DAD_" + cc.connAlias);
         this.includeList
-                = properties.getProperty("allowed_packages", "#",
+                = config.getProperty("allowed_packages", "#",
                         "DAD_" + cc.connAlias);
         if (this.includeList.equals("#")) {
             log.error("no allowed_packages property given for DAD " + cc.connAlias + " set property " + "DAD_" + cc.connAlias + ".allowed_packages");
             throw new Error("no allowed_packages given for DAD " + cc.connAlias);
         }
-        this.maxUploadSize = properties.getIntProperty("maxUploadSize", 8388608);
+        this.maxUploadSize = config.getIntProperty("maxUploadSize", 8388608);
         String nlsSetting
-                = properties.getProperty("nls_lang", null, "DAD_" + cc.connAlias);
+                = config.getProperty("nls_lang", null, "DAD_" + cc.connAlias);
         if (nlsSetting != null) {
             try {
                 String langSetting
