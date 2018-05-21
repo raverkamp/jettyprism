@@ -34,9 +34,6 @@ public class ConnInfo {
 
     final private static Logger log = Logger.getLogger(ConnInfo.class);
 
-    public static final int CONN_FREE = 1;
-    public static final int CONN_TX = 2;
-    public static final int CONN_DIR = 3;
     public java.lang.String connectString;
     public java.lang.String usr;
     public java.lang.String pass;
@@ -51,7 +48,6 @@ public class ConnInfo {
     public boolean alwaysCallDefaultPage;
     public java.lang.String customAuthentication;
     public boolean proxyUser;
-    public int status = CONN_FREE;
     // owa_public.owa_util.ident_arr information for 7x support
     public java.lang.String type_owner;
     public java.lang.String type_name;
@@ -137,6 +133,5 @@ public class ConnInfo {
                 = properties.getProperty("type_name", "OWA_UTIL", "DAD_" + aliasdef);
         type_subname
                 = properties.getProperty("type_subname", "IDENT_ARR", "DAD_" + aliasdef);
-        status = CONN_FREE;
     }
 }
