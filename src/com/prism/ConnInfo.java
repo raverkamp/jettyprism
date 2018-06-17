@@ -39,19 +39,12 @@ public class ConnInfo {
     public java.lang.String pass;
     public java.lang.String connAlias;
     public int errorLevel;
-    public java.lang.String errorPage;
     public java.lang.String dynamicLoginRealm;
     public java.lang.String documentTable;
     public java.lang.String docAccessPath;
     public java.lang.String docAccessProcedure;
-    public java.lang.String defaultPage;
-    public boolean alwaysCallDefaultPage;
     public java.lang.String customAuthentication;
     public boolean proxyUser;
-    // owa_public.owa_util.ident_arr information for 7x support
-    public java.lang.String type_owner;
-    public java.lang.String type_name;
-    public java.lang.String type_subname;
     // Customized values for ! and ^ characters
     public java.lang.String flexible_escape_char;
     public java.lang.String xform_escape_char;
@@ -61,12 +54,12 @@ public class ConnInfo {
      * This method makes a ConnInfo objects through the aliasdef Connection
      * alias is retrieved from the URL information Example: plsql => the URL
      * http://server:port/servlet/plsql/xx.yy?arg=val Example: www_dba => the
- URL http://server:port/servlet/www_dba/xx.yy?arg=val The aliasdef works
- with multiples zones definition in servlet config The servlet zones
- args must be pointed to the same prism.config and Prism.jar See
- servlet.config for more details Params: global.alias=plsql xml demo
- servlet xmld This method retrieves the factory that has to be created
- (the database to be used) from the config file (prism.config)
+     * URL http://server:port/servlet/www_dba/xx.yy?arg=val The aliasdef works
+     * with multiples zones definition in servlet config The servlet zones args
+     * must be pointed to the same prism.config and Prism.jar See servlet.config
+     * for more details Params: global.alias=plsql xml demo servlet xmld This
+     * method retrieves the factory that has to be created (the database to be
+     * used) from the config file (prism.config)
      *
      * @param aliasdef String
      * @throws Exception
@@ -81,8 +74,6 @@ public class ConnInfo {
                 = config.getProperty("dbusername", "", "DAD_" + aliasdef);
         pass
                 = config.getProperty("dbpassword", "", "DAD_" + aliasdef);
-        errorPage
-                = config.getProperty("errorPage", "/404.html", "DAD_" + aliasdef);
         dynamicLoginRealm
                 = config.getProperty("dynamicLoginRealm", aliasdef, "DAD_" + aliasdef);
         documentTable
@@ -91,10 +82,6 @@ public class ConnInfo {
                 = config.getProperty("docAccessPath", "docs", "DAD_" + aliasdef);
         docAccessProcedure
                 = config.getProperty("docAccessProcedure", "owa_public.wpg_testdoc.process_download", "DAD_" + aliasdef);
-        defaultPage
-                = config.getProperty("defaultPage", "wwwIndex.html", "DAD_" + aliasdef);
-        alwaysCallDefaultPage
-                = config.getBooleanProperty("alwaysCallDefaultPage", false, "DAD_" + aliasdef);
         customAuthentication
                 = config.getProperty("customAuthentication", "none", "DAD_" + aliasdef);
         connectString
@@ -110,14 +97,15 @@ public class ConnInfo {
         proxyUser = config.getBooleanProperty("useProxyUser", false, "DAD_" + aliasdef);
         if (log.isDebugEnabled()) {
             log.debug("User: " + usr);
-            log.debug("pass:                  " + pass);
-            log.debug("errorPage:             " + errorPage);
+            if (pass == null || pass.isEmpty()) {
+                log.debug("pass:                  " + "not given");
+            } else {
+                log.debug("pass:                  " + "is given");
+            }
             log.debug("dynamicLoginRealm:     " + dynamicLoginRealm);
             log.debug("documentTable:         " + documentTable);
             log.debug("docAccessPath:         " + docAccessPath);
             log.debug("docAccessProcedure:    " + docAccessProcedure);
-            log.debug("defaultPage:           " + defaultPage);
-            log.debug("alwaysCallDefaultPage: " + alwaysCallDefaultPage);
             log.debug("customAuthentication:  " + customAuthentication);
             log.debug("connectString:         " + connectString);
             log.debug("errorLevel:            " + errorLevel);
@@ -126,12 +114,5 @@ public class ConnInfo {
             log.debug("xformParamName:        " + xform_param_name);
             log.debug("useProxyUser:          " + proxyUser);
         }
-
-        type_owner
-                = config.getProperty("type_owner", "OWA_PUBLIC", "DAD_" + aliasdef);
-        type_name
-                = config.getProperty("type_name", "OWA_UTIL", "DAD_" + aliasdef);
-        type_subname
-                = config.getProperty("type_subname", "IDENT_ARR", "DAD_" + aliasdef);
     }
 }

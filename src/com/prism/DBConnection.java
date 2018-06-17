@@ -124,13 +124,13 @@ public class DBConnection {
                 String realms = getRealm();
                 throw new NotAuthorizedException(realms);
             }
-            if (((OracleConnection) sqlconn).isProxySession()) // may be was a failed page, close the session first
+            if (sqlconn.isProxySession()) // may be was a failed page, close the session first
             {
-                ((OracleConnection) sqlconn).close(((OracleConnection) sqlconn).PROXY_SESSION);
+                sqlconn.close(OracleConnection.PROXY_SESSION);
             }
             Properties proxyUserInfo = new Properties();
             proxyUserInfo.put("PROXY_USER_NAME", proxyUserName);
-            ((OracleConnection) sqlconn).openProxySession(OracleConnection.PROXYTYPE_USER_NAME, proxyUserInfo);
+            sqlconn.openProxySession(OracleConnection.PROXYTYPE_USER_NAME, proxyUserInfo);
             log.debug(".doCall - Proxy user: " + proxyUserName);
             //connectedUsr = proxyUserName;
         }
@@ -796,9 +796,6 @@ public class DBConnection {
      */
     private String getServletCommandString(HttpServletRequest req) {
         final String cmdString;
-        if (connInfo.alwaysCallDefaultPage) {
-            return connInfo.defaultPage;
-        }
         final String tail;
         if (req.getPathInfo() == null || req.getPathInfo().isEmpty()) {
             tail = req.getServletPath();
