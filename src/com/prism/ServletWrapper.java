@@ -164,7 +164,7 @@ public class ServletWrapper extends HttpServlet {
             log.debug(".sendErrorPage Not Found");
         }
         // LXG: changed to static access
-        res.sendError(HttpServletResponse.SC_NOT_FOUND);
+        res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
     public void sendFailureMsg(HttpServletResponse res,
