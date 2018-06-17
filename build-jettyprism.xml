@@ -51,8 +51,11 @@
             <manifest>
                 <attribute name="Main-Class"
                            value="spinat.jettyprism.Main"/>
-                <attribute name="Class-Path" value="./jetty-all-9.4.7.v20170914-uber.jar ./jconfig.jar ./log4j-1.2.17.jar ./ojdbc8.jar"/>
+                <attribute name="Class-Path" value="./jetty-all-9.4.7.v20170914-uber.jar ./log4j-1.2.17.jar ./ojdbc8.jar"/>
             </manifest>
+        </jar>
+        <!-- a simple jar file for inclusion of the servlet in another project-->
+        <jar jarfile="${dist}/jettyprism-war.jar" basedir="${build}">
         </jar>
         <copy todir="${dist}/jettyprism">
             <fileset refid="libs"/>
