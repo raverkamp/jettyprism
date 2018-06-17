@@ -68,10 +68,40 @@ loopback device (127.0.0.1). Otherwise the server will listen on all IP addresse
 The default is Y, meaning that it is not possible to access the server from
 other computers.
 
+
 The properties for the DBprism servlet start with "general." e.g.
 general.alias: x y
-the list of dads (space separated)
 
+Properties general 
+
+alias
+  the list of dads (space separated)
+
+Porpeties per DAD
+For each DAD the properties are prefixed with "DAD_<dadname>."
+If no dbusername for a DAD is given, then the user has to authenticate as a 
+database user. If a username is given, then also a password has to be given.
+
+connectString
+  the jdbs connect string, e.g. jdbc:oracle:thin:@localhost:1521:xe
+
+dbusername
+  the user name in the databse
+
+dbpassword
+  the password of the user
+
+dynamicLoginRealm
+  the realm for basic authentication, this will be displayed in the login dialog
+
+allowed_packages
+  a list of allowed packages whcih may be called in this DAD. The format is a
+  space separated list of <owner>.<package> . The owner and package name must 
+  be uppercase. The check is done after resolving synonyms!
+
+current_schema
+  the schema for resolving the called package. This results in a call to
+  "alter session set current_schema" when initializing the connection.
 
 *** Logging
 log4j.properties setze 
