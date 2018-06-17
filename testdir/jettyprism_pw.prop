@@ -20,7 +20,7 @@ general.errorLevel: 0
 general.UnauthorizedText: You must be enter DB username and password to access at the system
 general.errorPage: /404.html
 general.flexibleRequest: compact
-general.alias: x y
+general.alias: x y z
 general.behavior: 2
 DAD_x.dynamicLoginRealm: This is X.
 DAD_x.connectString: jdbc:oracle:thin:@localhost:1521:xe
@@ -34,3 +34,10 @@ DAD_y.connectString: jdbc:oracle:thin:@localhost:1521:xe
 #DAD_y.dbpassword=user_jp
 DAD_y.allowed_packages=USER_JP.THEWEB
 DAD_y.current_schema=SYS
+
+DAD_z.dynamicLoginRealm: This is Z.
+DAD_z.connectString: jdbc:oracle:thin:@localhost:1521:xe
+DAD_z.dbusername=user_jp
+DAD_z.dbpassword=$user_jp_pw
+DAD_z.allowed_packages=USER_JP.THEWEB
+DAD_z.current_schema=

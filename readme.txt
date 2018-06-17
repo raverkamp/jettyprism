@@ -35,10 +35,14 @@ The program takes one argument, the name a configuration file. It must be in the
 of a java properties file.
 
 
-All files are resolved local to the directory of the file, i.e. "." will be the
+All files are resolved local to the directory of the configuration file, i.e. "." will be the
 directory opf the file.
 
 *** Properties:
+In general: if a property is prefixed with "$", the "$" will be removed and the value
+will be used for look up in the environment. If a property value starts with "$$", 
+then the first "$" is removed and the rest is used as value.
+
 log4jconfig
 
 the name of the log4j property file. this maybe empty, then the default 

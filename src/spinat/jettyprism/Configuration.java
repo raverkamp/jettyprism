@@ -41,7 +41,17 @@ public class Configuration {
             if (!cats.containsKey(cat)) {
                 cats.put(cat, new Category(cat, new HashMap<String, String>()));
             }
-            cats.get(cat).map.put(subkey, (String) props.getProperty(key));
+            String value = (String) props.getProperty(key);
+            final String realValue;
+            if (value == null || !value.startsWith("$")) {
+                realValue = value;
+            } else if (value.startsWith("$$")) {
+                realValue = value.substring(1);
+            } else {
+                String envKey = value.substring(1);
+                realValue = System.getenv(envKey);
+            }
+            cats.get(cat).map.put(subkey, realValue);
         }
         return new Configuration(cats, null);
     }
