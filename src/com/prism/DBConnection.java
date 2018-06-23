@@ -17,7 +17,6 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import spinat.jettyprism.Configuration;
 
 import com.prism.utils.FlexibleRequest;
@@ -36,6 +35,8 @@ import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OracleTypes;
 import oracle.sql.CLOB;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This class plays the role of AbstractProduct of Abstract Factory pattern.
@@ -61,7 +62,8 @@ import oracle.sql.CLOB;
  */
 public class DBConnection {
 
-    Logger log = Logger.getLogger(DBConnection.class);
+     private static final Logger log = LogManager.getLogger();
+
 
     // From Package definition OWA_SEC
     /* PL/SQL Agent's authorization schemes                            */

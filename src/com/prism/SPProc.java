@@ -24,12 +24,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import oracle.jdbc.OracleConnection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import org.apache.log4j.Logger;
 
 public class SPProc {
 
-    private Logger log = Logger.getLogger(SPProc.class); //JHK
+     private static final Logger log = LogManager.getLogger();
 
     protected HashMap<String, HashMap> procedures = new HashMap<>();
     protected HashMap<String, ArrayList> arguments = new HashMap<>();

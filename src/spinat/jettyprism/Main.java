@@ -23,14 +23,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import org.apache.log4j.PropertyConfigurator;
+//import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
@@ -44,6 +46,8 @@ public class Main {
     private static void msg(String s) {
         System.out.println("### " + s);
     }
+
+    private static final Logger log = LogManager.getLogger();
 
     public static void main(String[] args) throws Exception {
         // it would be better nicer use ROOT, Oracle JDBC does not like that
@@ -68,13 +72,21 @@ public class Main {
         System.setProperty("user.dir", dpf.toString());
 
         String log4jprops = props.getProperty("log4jconfig", "");
-        if (log4jprops.equals("")) {
-            log4jprops = "log4j.properties";
+        if (!log4jprops.equals("")) {
+            File l4jf = new File(log4jprops).getAbsoluteFile();
+            msg("log4j config file " + l4jf);
+            if (l4jf.exists()) {
+                org.apache.logging.log4j.core.LoggerContext context
+                        = (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
+                // this will force a reconfiguration
+                // this is not a public API!
+                context.setConfigLocation(l4jf.toURI());
+            } else {
+                msg("skipped log4j config, config file does not exists: " + l4jf);
+            }
+        } else {
+            msg("no explict log4j config found");
         }
-        File l4jf = new File(log4jprops).getAbsoluteFile();
-        URL l4ju = l4jf.toURI().toURL();
-        msg("log4j config file " + l4jf);
-        PropertyConfigurator.configure(l4ju);
 
         String port = props.getProperty("port", "");
         int intPort;

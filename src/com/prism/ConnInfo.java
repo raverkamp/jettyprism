@@ -8,7 +8,8 @@
  */
 package com.prism;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spinat.jettyprism.Configuration;
 
 /**
@@ -32,7 +33,7 @@ import spinat.jettyprism.Configuration;
  */
 public class ConnInfo {
 
-    final private static Logger log = Logger.getLogger(ConnInfo.class);
+   private static final Logger log = LogManager.getLogger();
 
     public java.lang.String connectString;
     public java.lang.String usr;

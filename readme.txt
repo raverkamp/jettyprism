@@ -30,6 +30,10 @@ The file "main.jar" is executable. So copy the directory jettyprism to the
 installation folder and call
 java -e jettyprism/main.jar args ...
 
+** Logging
+The jettyprism servlet uses log4j2 for logging. If you have trouble configuring log4j2 then
+add -Dlog4j2.debug=true on the commandline. It helps.
+
 ** Running
 The program takes one argument, the name a configuration file. It must be in the form
 of a java properties file.
@@ -44,9 +48,10 @@ will be used for look up in the environment. If a property value starts with "$$
 then the first "$" is removed and the rest is used as value.
 
 log4jconfig
+the name of the log4j property file. If this is not empty and the file exists 
+then the default is overwritten. Other wise you can use other mtehods to configure
+log4j2. If there are problems with the log4j configuration, then use the 
 
-the name of the log4j property file. this maybe empty, then the default 
-"log4j.properties" is taken.
 
 Static file serving
 

@@ -27,7 +27,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spinat.jettyprism.Configuration;
 
 /**
@@ -42,10 +43,12 @@ import spinat.jettyprism.Configuration;
  */
 public class ServletWrapper extends HttpServlet {
 
-    private static Logger log = Logger.getLogger(ServletWrapper.class);
+     private static final Logger log = LogManager.getLogger();
+
     private DBPrism dbprism = null;
     private Configuration config;
     private int behavior;
+    private int errorLevel;
     private java.lang.String UnauthorizedText;
 
     public ServletWrapper() {
@@ -75,6 +78,7 @@ public class ServletWrapper extends HttpServlet {
             this.dbprism = new DBPrism();
             this.dbprism.init(config);
             this.behavior = config.getIntProperty("behavior", 0);
+            this.errorLevel = config.getIntProperty("errorLevel", 0);
             this.UnauthorizedText = config.getProperty("UnauthorizedText",
                     "You must be enter DB username and password to access at the system");
         } catch (IOException e) {
@@ -89,7 +93,6 @@ public class ServletWrapper extends HttpServlet {
     public void service(HttpServletRequest req,
             HttpServletResponse res) throws IOException {
         log.debug(".service entered.");
-        int errorLevel = 0;
         String errorPage = "/error.html";
         String alias = getAliasFromURI(req);
         try {

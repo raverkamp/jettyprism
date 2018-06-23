@@ -11,7 +11,8 @@ package com.prism;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This class stores the cgi environment to be passed to the DB.
@@ -29,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class CgiVars {
 
-    Logger log = Logger.getLogger(CgiVars.class);
+    private static final Logger log = LogManager.getLogger();
 
     public ArrayList<String> names = new ArrayList<>();
 

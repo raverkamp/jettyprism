@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spinat.jettyprism.Configuration;
 
 /**
@@ -45,7 +46,9 @@ import spinat.jettyprism.Configuration;
  */
 public class DBPrism {
 
-    final private static Logger log = Logger.getLogger(DBPrism.class);
+     private static final Logger log = LogManager.getLogger();
+
+  
     final public static java.lang.String NAME = "DBPrism";
     final public static java.lang.String VERSION = "2018-05-21-production";
     private ProcedureCache procedureCache = null;

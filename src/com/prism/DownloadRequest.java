@@ -24,8 +24,9 @@ import oracle.jdbc.OracleResultSet;
 import oracle.jdbc.OracleTypes;
 import oracle.sql.BFILE;
 import oracle.sql.BLOB;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import org.apache.log4j.Logger;
 
 /**
  * This class plays the role of AbstractProduct of the Abstract Factory pattern.
@@ -39,7 +40,7 @@ import org.apache.log4j.Logger;
  */
 public class DownloadRequest {
 
-    private static Logger log = Logger.getLogger(DownloadRequest.class);
+     private static final Logger log = LogManager.getLogger();
 
     protected HttpServletRequest req;
 
