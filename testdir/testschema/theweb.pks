@@ -26,5 +26,9 @@ procedure error;
 
 procedure flex(name_array owa.vc_arr, value_array owa.vc_arr);
 
+procedure file_upload_start;
+
+procedure file_upload(cont clob, bla varchar2, file_name varchar2);
+
 end;
 /

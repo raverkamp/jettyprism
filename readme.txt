@@ -73,6 +73,9 @@ loopback device (127.0.0.1). Otherwise the server will listen on all IP addresse
 The default is Y, meaning that it is not possible to access the server from
 other computers.
 
+max_form_size
+The maximum size for forms. The default Jetty limit is 200000 (I believe).
+
 
 The properties for the DBprism servlet start with "general." e.g.
 general.alias: x y

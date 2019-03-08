@@ -43,6 +43,16 @@ htp.p('<input type=text name="d">');
 htp.p('<input type="submit">');
 htp.p('</form>');
 
+htp.p('<div>FileUpload</div>');
+htp.p('<form method="post" action="./theweb.file_upload" enctype="multipart/form-data">');
+htp.p('
+  <label>Waehlen Sie eine Textdatei (*.txt, *.html usw.) von Ihrem Rechner aus.
+    <input name="content" type="file" size="50" accept="text/*"> 
+    <input name="bla" type="text" size="50"> 
+  </label>  
+  <button> und ab geht die Post!</button>
+</form>');
+
 htp.p('<a href="./!theweb.flex?key1=val1&key2=val2">Flextest</a>');
 
 htp.p('<ul>');
@@ -58,6 +68,9 @@ htp.p('<a href="./theweb.tables_demo">Tables Demo</a>');
 htp.p('</li>');
 htp.p('<li>');
 htp.p('<a href="./theweb.error">Exception</a>');
+htp.p('</li>');
+htp.p('<li>');
+htp.p('<a href="./theweb.file_upload_start">File Upload</a>');
 htp.p('</li>');
 htp.p('</ul>');
 htp.p('</div>');
@@ -286,6 +299,47 @@ begin
     htp.p('"'||name_array(i)||'": "'||replace(value_array(i),'"','\"')||'"');
   end loop;
   htp.p('}');
+end;
+
+
+
+procedure file_upload_start is
+begin
+  htp.p('<html><body>');
+  htp.p(q'[
+<html><body><h1>Upload File Test</h1>
+    <form action="./theweb.file_upload" method="post">
+    <input type="file" id="file_name" name="file_name"/>
+    <input type="text" id="bla" name="bla"/>
+    <input type="hidden" name="cont" id="cont"/>
+    <button type="submit">Upload!</button>
+<form>
+ 
+<script>
+  // https://www.html5rocks.com/en/tutorials/file/dndfiles/
+  function handleFileSelect(evt) {
+    var files = evt.target.files; // FileList object
+    if (files && files.length > 0) {
+      let theFile = files[0];
+      let reader = new FileReader();
+      // Closure to capture the file information.
+      reader.onload = function(e) {
+          document.getElementById('cont').value = reader.result;
+        };
+      reader.readAsText(theFile);
+    }
+  }
+  document.getElementById('file_name').addEventListener('change', handleFileSelect, false);
+</script>
+  
+  
+  ]');
+  htp.p('</html></body>');
+end;
+
+procedure file_upload(cont clob, bla varchar2,file_name varchar2) is
+begin
+  htp.p('bla='||bla||' file_name='||file_name||' length='||dbms_lob.getlength(cont));
 end;
 
 end;

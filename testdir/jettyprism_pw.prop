@@ -1,4 +1,4 @@
-http://localhost:8888/dads/user_jp/theweb.menu
+#http://localhost:8888/dads/x/theweb.menu
 #static.b.dir=yui/build
 #static.b.wdir=/yui/build
 #static.b.cache-control=max-age=86400, public
@@ -6,13 +6,13 @@ http://localhost:8888/dads/user_jp/theweb.menu
 static.c.dir=web
 static.c.wdir=/web
 
-log4jconfig=
-
-#prismconf=prism.xconf
+log4jconfig=log4j2.xml
 
 only_local=1
 
 port=8888
+
+max_form_size=400000
 
 # the jetty prism config
 general.cacheprocedure: true
