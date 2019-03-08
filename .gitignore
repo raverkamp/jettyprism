@@ -2,5 +2,5 @@
 /build/*
 /dist/*
 /nbproject/private/*
-/libs/ojdbc8.jar
+/libs/*
 /testdir/pytest/pyenv/*
