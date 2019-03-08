@@ -43,7 +43,7 @@ import spinat.jettyprism.Configuration;
  */
 public class ServletWrapper extends HttpServlet {
 
-     private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger();
 
     private DBPrism dbprism = null;
     private Configuration config;

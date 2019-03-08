@@ -46,9 +46,8 @@ import spinat.jettyprism.Configuration;
  */
 public class DBPrism {
 
-     private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger();
 
-  
     final public static java.lang.String NAME = "DBPrism";
     final public static java.lang.String VERSION = "2018-05-21-production";
     private ProcedureCache procedureCache = null;
@@ -85,7 +84,7 @@ public class DBPrism {
                 log.debug("Auto " + req.getHeader("Authorization"));
                 String s = req.getHeader("Authorization").substring(6);
                 byte[] bytes = DatatypeConverter.parseBase64Binary(s);
-                str = new String(bytes,   StandardCharsets.UTF_8);
+                str = new String(bytes, StandardCharsets.UTF_8);
                 log.debug("ist: " + str);
             } catch (Exception e) {
                 str = ":";

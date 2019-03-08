@@ -62,8 +62,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class DBConnection {
 
-     private static final Logger log = LogManager.getLogger();
-
+    private static final Logger log = LogManager.getLogger();
 
     // From Package definition OWA_SEC
     /* PL/SQL Agent's authorization schemes                            */
@@ -451,7 +450,7 @@ public class DBConnection {
 
     /**
      * Create a concrete DBConnection (DBConnPLSQL). Find extra config
- attributes of this connection and return a concrete connection object.
+     * attributes of this connection and return a concrete connection object.
      */
     public DBConnection(Configuration config, ConnInfo cc, OracleConnection sqlcon) throws SQLException {
 

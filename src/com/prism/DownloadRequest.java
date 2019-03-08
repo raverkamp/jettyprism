@@ -27,7 +27,6 @@ import oracle.sql.BLOB;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 /**
  * This class plays the role of AbstractProduct of the Abstract Factory pattern.
  * Declares an interface for a type of product object (create method)<BR>
@@ -40,7 +39,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class DownloadRequest {
 
-     private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger();
 
     protected HttpServletRequest req;
 

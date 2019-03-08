@@ -122,8 +122,9 @@ public class Main {
         // or programmatically obtain it for use in test cases.
         HandlerList handlers = new HandlerList();
 
-        Handler dadHandler = createDADHandler(props);
+        int maxFormSize = Integer.parseInt(props.getProperty("max_form_size", "0"));
 
+        Handler dadHandler = createDADHandler(props, maxFormSize);
         ArrayList<Handler> l = createStaticHandler(props);
         for (Handler h : l) {
             handlers.addHandler(h);
@@ -146,8 +147,11 @@ public class Main {
         server.join();
     }
 
-    static Handler createDADHandler(Properties props) throws IOException {
+    static Handler createDADHandler(Properties props, int maxFormSize) throws IOException {
         ServletContextHandler handler = new ServletContextHandler();
+        if (maxFormSize > 0) {
+            handler.setMaxFormContentSize(maxFormSize);
+        }
         // Passing in the class for the servlet allows jetty to instantite an instance of that servlet and mount it
         // on a given context path.
         // !! This is a raw Servlet, not a servlet that has been configured through a web.xml or anything like that !!

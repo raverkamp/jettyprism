@@ -33,7 +33,7 @@ import spinat.jettyprism.Configuration;
  */
 public class ConnInfo {
 
-   private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger();
 
     public java.lang.String connectString;
     public java.lang.String usr;

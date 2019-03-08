@@ -27,10 +27,9 @@ import oracle.jdbc.OracleConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 public class SPProc {
 
-     private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger();
 
     protected HashMap<String, HashMap> procedures = new HashMap<>();
     protected HashMap<String, ArrayList> arguments = new HashMap<>();

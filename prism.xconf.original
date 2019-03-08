@@ -547,27 +547,27 @@
       com.prism.utils.JndiDBPrismConnectionCacheImpl Connection Caching using
       JNDI Datasources defined into a J2EE container (data-sources.xml file)
 
-    <property name="class" value="com.prism.utils.JndiDBPrismConnectionCacheImpl"/>
-    <property name="class" value="com.prism.utils.JdbcDBPrismConnectionCacheImpl"/>
-    <property name="class" value="com.prism.oracle.UCPDBPrismConnectionCacheImpl"/>
-    -->
-    <!--<property name="class" value="com.prism.oracle.JTADBPrismConnectionCacheImpl"/-->
-    <property name="class" value="com.prism.utils.JdbcDBPrismConnectionCacheImpl"/>
+        <property name="class" value="com.prism.utils.JndiDBPrismConnectionCacheImpl"/>
+        <property name="class" value="com.prism.utils.JdbcDBPrismConnectionCacheImpl"/>
+        <property name="class" value="com.prism.oracle.UCPDBPrismConnectionCacheImpl"/>
+        -->
+        <!--<property name="class" value="com.prism.oracle.JTADBPrismConnectionCacheImpl"/-->
+        <property name="class" value="com.prism.utils.JdbcDBPrismConnectionCacheImpl"/>
     
     
-  </category>
+    </category>
 
-<!--
-TX syntax for each names defined in Manager.TXNames
-must be an exact definition of Begin,Rollback,Commit,BelongTo, and TimeOut values
-BelongTo URI is an list of ; separated field of URI inside the transaccion end it by *
-TimeOut is in seconds
--->
-  <category name="TX_demo">
-    <property name="BeginURI" value="${demo.path}/m_tx.tx_start"/>
-    <property name="CommitURI" value="${demo.path}/m_tx.tx_end"/>
-    <property name="RollBackURI" value="${demo.path}/m_tx.tx_rollback"/>
-    <property name="BelongTo" value="${demo.path}/m_tx.*"/>
-    <property name="TimeOut" value="500"/>
-  </category>
+    <!--
+    TX syntax for each names defined in Manager.TXNames
+    must be an exact definition of Begin,Rollback,Commit,BelongTo, and TimeOut values
+    BelongTo URI is an list of ; separated field of URI inside the transaccion end it by *
+    TimeOut is in seconds
+    -->
+    <category name="TX_demo">
+        <property name="BeginURI" value="${demo.path}/m_tx.tx_start"/>
+        <property name="CommitURI" value="${demo.path}/m_tx.tx_end"/>
+        <property name="RollBackURI" value="${demo.path}/m_tx.tx_rollback"/>
+        <property name="BelongTo" value="${demo.path}/m_tx.*"/>
+        <property name="TimeOut" value="500"/>
+    </category>
 </properties>
