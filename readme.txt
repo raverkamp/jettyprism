@@ -109,9 +109,5 @@ current_schema
   "alter session set current_schema" when initializing the connection.
 
 *** Logging
-log4j.properties setze 
-log4j.rootLogger=INFO, A1
-oder
-log4j.rootLogger=DEBUG, A1
 
 Use the INFO level, there is much less output
